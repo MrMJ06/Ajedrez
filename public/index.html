@@ -14,9 +14,9 @@
     <h1>Hello world!</h1>
     <div class="container" ng-app="myApp" ng-controller="myCtrl">
             <div class="row" ng-repeat="row in table">
-                <div class="col" ng-repeat="piece in row">             
-                    <div id="{{piece.x*10+piece.y}}" class="black {{piece.selected}}" ng-if="(piece.x+piece.y)%2==1" ng-click="showCoordinates(piece);"></div>
-                    <div id="{{piece.x*10+piece.y}}" class="white {{piece.selected}}" ng-if="(piece.x+piece.y)%2==0" ng-click="showCoordinates(piece);"></div>
+                <div class="col" ng-repeat="box in row">             
+                    <div id="{{box.x*10+box.y}}" class="black {{box.selected}}" ng-if="(box.x+box.y)%2==1" ng-click="selectBox(box);"><image class="img" src="images/peon.png" ng-if="box.piece.type=='peon'"></image></div>
+                    <div id="{{box.x*10+box.y}}" class="white {{box.selected}}" ng-if="(box.x+box.y)%2==0" ng-click="selectBox(box);"><image class="img" src="images/peon.png" ng-if="box.piece.type=='peon'"></image></div>
                 </div>
             </div>
         </div>
