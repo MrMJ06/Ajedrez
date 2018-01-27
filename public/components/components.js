@@ -118,35 +118,49 @@ function showPeonMoves(box, scope) {
 }
 
 function showQueenMoves(box, scope) {
-  for (var i = 0; i < 8; i++) {
-    //Selects the vertical
-    if (scope.table[box.y][box.x + i]!=undefined && scope.table[box.y][box.x + i].piece == undefined) {
+
+  var rBlocked = false, lBlocked = false, tBlocked = false, bBlocked = false, rtBlocked= false, rbBlocked= false, ltBlocked= false, lbBlocked = false;
+
+  for (var i = 1; i < 8; i++) {
+    if (!rBlocked && (box.x + i)<8 && scope.table[box.y][box.x + i]!=undefined && scope.table[box.y][box.x + i].piece == undefined) {//Selects the right
       scope.table[box.y][box.x + i].selected = true;
+    }else if(!rBlocked && (box.x + i)<8 && scope.table[box.y][box.x + i]!=undefined && scope.table[box.y][box.x + i].piece != undefined){
+      rBlocked = true;
     }
-     if (scope.table[box.y][box.x - i] != undefined && scope.table[box.y][box.x - i].piece == undefined) {
+    if (!lBlocked && (box.x - i)>=0 && scope.table[box.y][box.x - i] != undefined && scope.table[box.y][box.x - i].piece == undefined) {//Selects the left
       scope.table[box.y][box.x - i].selected = true;
+    }else if(!lBlocked && (box.x - i)>=0 && scope.table[box.y][box.x - i]!=undefined && scope.table[box.y][box.x - i].piece != undefined){
+      lBlocked = true;
     }
-
-    for (var j = 0; j < 8; j++) {
-      if (scope.table[box.y + j][box.x] != undefined && scope.table[box.y + j][box.x].piece === undefined) { //Selects the horizontal
-        scope.table[box.y + i][box.x].selected = true;
-      }
-      if (scope.table[box.y - j][box.x]!= undefined&&scope.table[box.y - j][box.x].piece === undefined) { //Selects the horizontal
-        scope.table[box.y - j][box.x].selected = true;
-      }
-       if (scope.table[box.y + j][box.x + i]!= undefined && scope.table[box.y + j][box.x + i].piece === undefined) { //Right top diagonal
-        scope.table[box.y + j][box.x + i].selected = true;
-      }
-      if (scope.table[box.y - j][box.x + i]!= undefined && scope.table[box.y - j][box.x + i].piece === undefined) { //Right button diagonal
-        scope.table[box.y - j][box.x + i].selected = true;
-      }
-       if (scope.table[box.y + j][box.x - i]!= undefined && scope.table[box.y + j][box.x - i].piece === undefined) { //Left top diagonal
-        scope.table[box.y + j][box.x - i].selected = true;
-      }
-       if (scope.table[box.y - j][box.x - i]!= undefined && scope.table[box.y - j][box.x - i].piece === undefined) { //Left button diagonal
-        scope.table[box.y - j][box.x - i].selected = true;
-      }
-
+    if (!tBlocked && (box.y + i)<8 && scope.table[box.y + i][box.x] != undefined && scope.table[box.y + i][box.x].piece === undefined) { //Selects the top
+      scope.table[box.y + i][box.x].selected = true;
+    }else if(!tBlocked && (box.y + i)<8 && scope.table[box.y + i][box.x] != undefined && scope.table[box.y + i][box.x].piece != undefined){
+      tBlocked = true;
+    }
+    if (!bBlocked && (box.y - i)>=0 && scope.table[box.y - i][box.x]!= undefined&&scope.table[box.y - i][box.x].piece === undefined) { //Selects the buttom
+      scope.table[box.y - i][box.x].selected = true;
+    }else if(!bBlocked && (box.y - i)>=0 && scope.table[box.y + i][box.x] != undefined && scope.table[box.y - i][box.x].piece != undefined){
+      bBlocked = true;
+    }
+    if (!rtBlocked && (box.y + i)<8 && (box.x + i)<8 && scope.table[box.y + i][box.x + i]!= undefined && scope.table[box.y + i][box.x + i].piece === undefined) { //Right top diagonal
+      scope.table[box.y + i][box.x + i].selected = true;
+    }else if(!rtBlocked && (box.y + i)<8 && (box.x + i)<8 && scope.table[box.y + i][box.x + i]!= undefined && scope.table[box.y + i][box.x + i].piece != undefined){
+      rtBlocked=true;
+    }
+    if (!rbBlocked && (box.y - i)>=0 && (box.x + i)<8 && scope.table[box.y - i][box.x + i]!= undefined && scope.table[box.y - i][box.x + i].piece === undefined) { //Right button diagonal
+      scope.table[box.y - i][box.x + i].selected = true;
+    }else if(!rbBlocked && (box.y - i)>=0 && (box.x + i)<8 && scope.table[box.y - i][box.x + i]!= undefined && scope.table[box.y - i][box.x + i].piece != undefined){
+      rbBlocked=true;
+    }
+    if (!ltBlocked && (box.y + i)<8 && (box.x - i)>=0 && scope.table[box.y + i][box.x - i]!= undefined && scope.table[box.y + i][box.x - i].piece === undefined) { //Left top diagonal
+      scope.table[box.y + i][box.x - i].selected = true;
+    }else if(!ltBlocked && (box.y + i)<8 && (box.x - i)>=0 && scope.table[box.y + i][box.x - i]!= undefined && scope.table[box.y + i][box.x - i].piece != undefined){
+      ltBlocked = true;
+    }
+    if (!lbBlocked && (box.y - i)>=0 && (box.x - i)>=0 && scope.table[box.y - i][box.x - i]!= undefined && scope.table[box.y - i][box.x - i].piece === undefined) { //Left button diagonal
+      scope.table[box.y - i][box.x - i].selected = true;
+    }else if(!lbBlocked && (box.y - i)>=0 && (box.x - i)>=0 && scope.table[box.y - i][box.x - i]!= undefined && scope.table[box.y - i][box.x - i].piece != undefined){
+      lbBlocked=true;
     }
   }
 }
@@ -181,43 +195,54 @@ function showKingMoves(box, scope) {
 }
 
 function showTowerMoves(box, scope) {
-  for (var i = 0; i < 8; i++) {
-    //Selects the vertical
-    if (scope.table[box.y][box.x + i]!= undefined && scope.table[box.y][box.x + i].piece === undefined) {
+  var rBlocked = false, lBlocked = false, tBlocked = false, bBlocked = false;
+  for (var i = 1; i < 8; i++) {
+    if (!rBlocked && (box.x + i)<8 && scope.table[box.y][box.x + i]!= undefined && scope.table[box.y][box.x + i].piece === undefined) {//Selects right
       scope.table[box.y][box.x + i].selected = true;
+    }else if(!rBlocked && (box.x + i)<8 && scope.table[box.y][box.x + i]!= undefined && scope.table[box.y][box.x + i].piece != undefined){
+      rBlocked = true;
     }
-    if (scope.table[box.y][box.x - i]!= undefined && scope.table[box.y][box.x - i].piece === undefined) {
+    if (!lBlocked && (box.x - i)>=0 && scope.table[box.y][box.x - i]!= undefined && scope.table[box.y][box.x - i].piece === undefined) {//Selects left
       scope.table[box.y][box.x - i].selected = true;
+    }else if(!lBlocked && (box.x - i)>=0 && scope.table[box.y][box.x - i]!= undefined && scope.table[box.y][box.x - i].piece != undefined){
+      lBlocked = true;
     }
-
-    for (var j = 0; j < 8; j++) {
-      if (scope.table[box.y + j][box.x]!= undefined && scope.table[box.y + j][box.x].piece === undefined) { //Selects the horizontal
-        scope.table[box.y + i][box.x].selected = true;
-      } 
-      if (scope.table[box.y - j][box.x]!= undefined && scope.table[box.y - j][box.x].piece === undefined) { //Selects the horizontal
-        scope.table[box.y - j][box.x].selected = true;
-      }
+    if (!tBlocked && (box.y + i)<8 && scope.table[box.y + i][box.x]!= undefined && scope.table[box.y + i][box.x].piece === undefined) { //Selects top
+      scope.table[box.y + i][box.x].selected = true;
+    }else if(!tBlocked && (box.y + i)<8 && scope.table[box.y+ i][box.x ]!= undefined && scope.table[box.y+ i][box.x].piece != undefined){
+      tBlocked = true;
+    }
+    if (!bBlocked && (box.y - i)>=0 && scope.table[box.y - i][box.x]!= undefined && scope.table[box.y - i][box.x].piece === undefined) { //Selects buttom
+      scope.table[box.y - i][box.x].selected = true;
+    }else if(!bBlocked &&(box.y - i)>=0 && scope.table[box.y-i][box.x ]!= undefined && scope.table[box.y-i][box.x ].piece != undefined){
+      bBlocked = true;
     }
   }
 }
 
 function showBishopMoves(box, scope) {
-  for (var i = 0; i < 8; i++) {
-    for (var j = 0; j < 8; j++) {
-      if (scope.table[box.y + j][box.x + i]!= undefined && scope.table[box.y + j][box.x + i].piece === undefined) { //Right top diagonal
-        scope.table[box.y + j][box.x + i].selected = true;
-      }
-      if (scope.table[box.y - j][box.x + i]!= undefined && scope.table[box.y - j][box.x + i].piece === undefined) { //Right button diagonal
-        scope.table[box.y - j][box.x + i].selected = true;
-      }
-      if (scope.table[box.y + j][box.x - i]!= undefined && scope.table[box.y + j][box.x - i].piece === undefined) { //Left top diagonal
-        scope.table[box.y + j][box.x - i].selected = true;
-      }
-      if (scope.table[box.y - j][box.x - i]!= undefined && scope.table[box.y - j][box.x - i].piece === undefined) { //Left button diagonal
-        scope.table[box.y - j][box.x - i].selected = true;
-      }
-
-    }
+  var rtBlocked= false, rbBlocked= false, ltBlocked= false, lbBlocked = false;
+  for (var i = 1; i < 8; i++) {
+        if (!rtBlocked && (box.y + i) < 8 && (box.x + i) < 8 && scope.table[box.y + i][box.x + i]!= undefined && scope.table[box.y + i][box.x + i].piece === undefined) { //Right top diagonal
+          scope.table[box.y + i][box.x + i].selected = true;
+        }else if(!rtBlocked &&(box.y + i) < 8 && (box.x + i) < 8 && scope.table[box.y + i][box.x + i]!= undefined && scope.table[box.y + i][box.x + i].piece != undefined && scope.table[box.y + i][box.x + i].piece!=box.piece){//Block the way if there is a piece
+          rtBlocked=true;
+        }
+        if (!rbBlocked && (box.y - i) >=0 && (box.x + i) < 8 && scope.table[box.y - i][box.x + i]!= undefined && scope.table[box.y - i][box.x + i].piece === undefined ) { //Right button diagonal
+          scope.table[box.y - i][box.x + i].selected = true;
+        }else if(!rbBlocked && (box.y - i) < 8 && (box.x + i) < 8 && scope.table[box.y - i][box.x + i]!= undefined && scope.table[box.y - i][box.x + i].piece != undefined){//Block the way if there is a piece
+          rbBlocked=true;
+        }
+        if (!ltBlocked && (box.y + i) < 8 && (box.x - i) >=0 && scope.table[box.y + i][box.x - i]!= undefined && scope.table[box.y + i][box.x - i].piece === undefined) { //Left top diagonal
+          scope.table[box.y + i][box.x - i].selected = true;
+        }else if(!ltBlocked &&(box.y + i) < 8 && (box.x - i) < 8 && scope.table[box.y + i][box.x - i]!= undefined && scope.table[box.y + i][box.x - i].piece != undefined){//Block the way if there is a piece
+          ltBlocked=true;
+        }
+        if (!lbBlocked && (box.y - i) >= 0 && (box.x - i) >= 0 && scope.table[box.y - i][box.x - i]!= undefined && scope.table[box.y - i][box.x - i].piece === undefined) { //Left button diagonal
+          scope.table[box.y - i][box.x - i].selected = true;
+        }else if(!lbBlocked &&(box.y - i) < 8 && (box.x - i) < 8 && scope.table[box.y - i][box.x - i]!= undefined && scope.table[box.y - i][box.x - i].piece != undefined){//Block the way if there is a piece
+          lbBlocked=true;
+        }
   }
 }
 
@@ -225,7 +250,7 @@ function showHorseMoves(box, scope) {
 
     //TODO: ARREglar comentarios
 
-    if (scope.table[box.y + 1][box.x - 2]!= undefined && scope.table[box.y +1][box.x - 2].piece === undefined) { //Left top L
+    if (scope.table[box.y + 1][box.x - 2]!= undefined && scope.table[box.y +1][box.x - 2].piece === undefined) { //Left top  L
       scope.table[box.y +1][box.x - 2].selected = true;
     }
     if (scope.table[box.y + 1][box.x + 2]!= undefined && scope.table[box.y + 1][box.x + 2].piece === undefined) { //Right top L
