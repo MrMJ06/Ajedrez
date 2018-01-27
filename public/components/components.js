@@ -101,7 +101,7 @@ function initiateFunctions(scope) {
 /**
  * Show moves logic
  */
-
+//TODO: Fix commentaries and add the kill implementation
 function showPeonMoves(box, scope) {
 
   if (scope.table[box.y][box.x + 1].piece === undefined && box.piece.color == 'black') { //Black move
