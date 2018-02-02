@@ -107,7 +107,7 @@ function initiateFunctions(scope) {
 /**
  * get moves logic
  */
-//TODO: Fix commentaries
+//TODO: Fix commentaries 
 function getPeonMoves(box, scope) {
 
   var selectedBoxes = new Array();
