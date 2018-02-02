@@ -46,7 +46,7 @@ function initiateFunctions(scope) {
      */
     for (var i = 0; i < 8; i++) {
       for (var j = 0; j < 8; j++) {
-        if (scope.table[i][j].selected && scope.table[i][j].piece != undefined && scope.table[i][j].piece.threatened == undefined) {
+        if (scope.table[i][j].selected && scope.table[i][j].piece != undefined && scope.table[i][j].piece.threatened == false) {
           selectedPiece = scope.table[i][j];
         } else if (scope.table[i][j].selected) {
           selectedBoxes.push(scope.table[i][j]);
@@ -62,17 +62,17 @@ function initiateFunctions(scope) {
       //Checks that the user want to move to a selected box
       if (selectedBoxes.indexOf(box) != -1) {
         
-        if (selectedPiece.piece.type == "peon") {
+        if (selectedPiece.piece.type == "peon") {//Invalidate the peon to move two boxes
           selectedPiece.piece.firstMove = false;
         }
-        if(box.piece!=undefined){
+        /*if(box.piece!=undefined){//Check that we are killing a piece and delete him
           scope.table[box.y][box.x].piece = undefined;
-        }
+        }*/
         scope.table[box.y][box.x].piece = selectedPiece.piece;
         scope.table[selectedPiece.y][selectedPiece.x].piece = undefined;
       }
       clearTable(scope);
-    } else if (selectedPiece === undefined) { //Check that a user selected a box and there is no one selected before
+    } else if (selectedPiece === undefined) { //Check that a user selected a box and there is no piece selected before
       clearTable(scope);
       box.selected = !box.selected;
 
@@ -98,7 +98,7 @@ function initiateFunctions(scope) {
           break;
       }
       selectBoxes(selectedBoxes);
-    } else {
+    } else {//In any other case we clear the table
       clearTable(scope);
     }
   }
@@ -107,7 +107,7 @@ function initiateFunctions(scope) {
 /**
  * get moves logic
  */
-//TODO: Fix commentaries and add the kill implementation
+//TODO: Fix commentaries
 function getPeonMoves(box, scope) {
 
   var selectedBoxes = new Array();
@@ -447,7 +447,8 @@ function putPiece(i, j) {
       x: j,
       y: i,
       firstMove: true,
-      dead: false
+      threatened: false,
+
     };
   } else if (j == 6) {
     box.piece = {
@@ -456,7 +457,7 @@ function putPiece(i, j) {
       x: j,
       y: i,
       firstMove: true,
-      dead: false
+      threatened: false
     };
   }
   //Initiate towers
@@ -466,7 +467,7 @@ function putPiece(i, j) {
       color: "black",
       x: j,
       y: i,
-      dead: false
+      threatened: false
     };
   } else if (j === 7 && i === 0 || j === 7 & i === 7) {
     box.piece = {
@@ -474,7 +475,7 @@ function putPiece(i, j) {
       color: "white",
       x: j,
       y: i,
-      dead: false
+      threatened: false
     };
   }
   //Initiate horses
@@ -484,7 +485,7 @@ function putPiece(i, j) {
       color: "black",
       x: j,
       y: i,
-      dead: false
+      threatened: false
     };
   } else if (j === 7 && i === 1 || j === 7 & i === 6) {
     box.piece = {
@@ -492,7 +493,7 @@ function putPiece(i, j) {
       color: "white",
       x: j,
       y: i,
-      dead: false
+      threatened: false
     };
   }
   //Initiate bishops
@@ -502,7 +503,7 @@ function putPiece(i, j) {
       color: "black",
       x: j,
       y: i,
-      dead: false
+      threatened: false
     };
   } else if (j === 7 && i === 2 || j === 7 & i === 5) {
     box.piece = {
@@ -510,7 +511,7 @@ function putPiece(i, j) {
       color: "white",
       x: j,
       y: i,
-      dead: false
+      threatened: false
     };
   }
   //Initiate king and queen black
@@ -520,7 +521,7 @@ function putPiece(i, j) {
       color: "black",
       x: j,
       y: i,
-      dead: false
+      threatened: false
     };
   } else if (j === 0 && i === 4) {
     box.piece = {
@@ -528,7 +529,7 @@ function putPiece(i, j) {
       color: "black",
       x: j,
       y: i,
-      dead: false
+      threatened: false
     };
   }
   //Initiate king and queen white
@@ -538,7 +539,7 @@ function putPiece(i, j) {
       color: "white",
       x: j,
       y: i,
-      dead: false
+      threatened: false
     };
   } else if (j === 7 && i === 4) {
     box.piece = {
@@ -546,7 +547,7 @@ function putPiece(i, j) {
       color: "white",
       x: j,
       y: i,
-      dead: false
+      threatened: false
     };
   }
 
@@ -560,7 +561,7 @@ function clearTable(scope) {
     for (var j = 0; j < 8; j++) {
       scope.table[i][j].selected = false;
       if(scope.table[i][j].piece!=undefined){
-        scope.table[i][j].piece.threatened = undefined;
+        scope.table[i][j].piece.threatened = false;
       }
     }
   }
