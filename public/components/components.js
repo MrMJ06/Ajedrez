@@ -3,6 +3,7 @@ app.controller('myCtrl', function ($scope) {
 
   initiateFunctions($scope);
   $scope.table = init();
+  $scope.turn  = getFirstTurn();//Selects a color to iniciate the game
 
 });
 
@@ -55,22 +56,27 @@ function initiateFunctions(scope) {
     }
 
     /**
-     * Check that a user want to move a piece
+     * Check that a user want to move a piece and is his turn
      */
-    if (selectedPiece != undefined && selectedPiece.piece != undefined && box !== selectedPiece) {
+    if (selectedPiece != undefined && selectedPiece.piece != undefined && box !== selectedPiece && scope.turn==selectedPiece.piece.color) {
       
       //Checks that the user want to move to a selected box
       if (selectedBoxes.indexOf(box) != -1) {
         
         if (selectedPiece.piece.type == "peon") {//Invalidate the peon to move two boxes
           selectedPiece.piece.firstMove = false;
+
+          if(selectedPiece.piece.color=="white" && box.x==0){
+            selectedPiece.piece.type="queen";
+          }else if(selectedPiece.piece.color=="black" && box.x==7){
+            selectedPiece.piece.type="queen";
+          }
         }
-        /*if(box.piece!=undefined){//Check that we are killing a piece and delete him
-          scope.table[box.y][box.x].piece = undefined;
-        }*/
         scope.table[box.y][box.x].piece = selectedPiece.piece;
         scope.table[selectedPiece.y][selectedPiece.x].piece = undefined;
+        scope.turn = getNextTurn(scope.turn);
       }
+      
       clearTable(scope);
     } else if (selectedPiece === undefined) { //Check that a user selected a box and there is no piece selected before
       clearTable(scope);
@@ -123,6 +129,20 @@ function getPeonMoves(box, scope) {
     if ((box.x - 2)>=0 && scope.table[box.y][box.x - 2].piece === undefined && box.piece.firstMove == true) { //The firs time a peon can move 2 boxes
       selectedBoxes.push(scope.table[box.y][box.x - 2]);
     }
+  }
+  if((box.x + 1)<8 && (box.y+1)<8 && scope.table[box.y+1][box.x + 1].piece !== undefined && box.piece.color == 'black'){
+    selectedBoxes.push(scope.table[box.y+1][box.x + 1]);
+    scope.table[box.y+1][box.x + 1].piece.threatened=true;
+  }else if((box.x - 1)>=0 && (box.y+1)<8 && scope.table[box.y+1][box.x - 1].piece !== undefined && box.piece.color == 'white'){
+    selectedBoxes.push(scope.table[box.y+1][box.x - 1]);
+    scope.table[box.y+1][box.x - 1].piece.threatened=true;
+  }
+  if((box.x + 1)<8 && (box.y-1)>=0 && scope.table[box.y-1][box.x + 1].piece !== undefined && box.piece.color == 'black'){
+    selectedBoxes.push(scope.table[box.y-1][box.x + 1]);
+    scope.table[box.y-1][box.x + 1].piece.threatened=true;
+  }else if((box.x - 1)>=0 && (box.y-1)>=0 && scope.table[box.y-1][box.x - 1].piece !== undefined && box.piece.color == 'white'){
+    selectedBoxes.push(scope.table[box.y-1][box.x - 1]);
+    scope.table[box.y-1][box.x - 1].piece.threatened=true;
   }
 
   return selectedBoxes;
@@ -571,4 +591,32 @@ function selectBoxes(selectedBoxes) {
   for (var i = 0; i < selectedBoxes.length; i++) {
     selectedBoxes[i].selected = true;
   }
+}
+
+function getFirstTurn(){
+  var color;
+  var randNumb;
+  
+  randNumb = Math.round(Math.random());
+
+  if(randNumb==1){
+    color = "white";
+  }else{
+    color="black";
+  }
+
+  return color;
+}
+
+function getNextTurn(turn){
+
+  var nxtTurn;
+
+  if(turn=="white"){
+    nxtTurn = "black";
+  }else{
+    nxtTurn="white";
+  }
+
+  return nxtTurn;
 }
