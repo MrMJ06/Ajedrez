@@ -3,7 +3,7 @@ app.controller('myCtrl', function ($scope) {
 
   initiateFunctions($scope);
   $scope.table = init();
-  $scope.turn  = getFirstTurn();//Selects a color to iniciate the game
+  $scope.turn = getFirstTurn(); //Selects a color to iniciate the game
 
 });
 
@@ -58,53 +58,49 @@ function initiateFunctions(scope) {
     /**
      * Check that a user want to move a piece and is his turn
      */
-    if (selectedPiece != undefined && selectedPiece.piece != undefined && box !== selectedPiece && scope.turn==selectedPiece.piece.color) {
-      
+    if (selectedPiece != undefined && selectedPiece.piece != undefined && box !== selectedPiece && scope.turn == selectedPiece.piece.color) {
+
       //Checks that the user want to move to a selected box
       if (selectedBoxes.indexOf(box) != -1) {
-        
-        if (selectedPiece.piece.type == "peon") {//Invalidate the peon to move two boxes
+
+        if (selectedPiece.piece.type == "peon") { //Invalidate the peon to move two boxes
           selectedPiece.piece.firstMove = false;
 
-          if(selectedPiece.piece.color=="white" && box.x==0){
-            selectedPiece.piece.type="queen";
-          }else if(selectedPiece.piece.color=="black" && box.x==7){
-            selectedPiece.piece.type="queen";
+          if (selectedPiece.piece.color == "white" && box.x == 0) {
+            selectedPiece.piece.type = "queen";
+          } else if (selectedPiece.piece.color == "black" && box.x == 7) {
+            selectedPiece.piece.type = "queen";
           }
         }
+        
         scope.table[box.y][box.x].piece = selectedPiece.piece;
-        scope.table[selectedPiece.y][selectedPiece.x].piece = undefined;
-        scope.turn = getNextTurn(scope.turn);
+
+        if(isCheck(scope.table[box.y][box.x])){
+          scope.table[box.y][box.x].piece.check=true;
+          scope.checkBox = scope.table[box.y][box.x];
+          scope.table[selectedPiece.y][selectedPiece.x].piece = undefined;
+          scope.turn = getNextTurn(scope.turn);
+        }else if(scope.table[box.y][box.x].piece.type=="king" && getMovesWithoutCheck(scope.table[box.y][box.x]).length!=0){
+          scope.table[box.y][box.x].piece = undefined;
+        }else if(scope.table[box.y][box.x].piece.type=="king" && getMovesWithoutCheck(scope.table[box.y][box.x]).length==0){
+          scope.end = true;
+        }else{
+          scope.table[box.y][box.x].piece.check=false;
+          scope.checkPiece = undefined;
+          scope.table[selectedPiece.y][selectedPiece.x].piece = undefined;
+          scope.turn = getNextTurn(scope.turn);
+        }
+
       }
-      
+
       clearTable(scope);
     } else if (selectedPiece === undefined) { //Check that a user selected a box and there is no piece selected before
       clearTable(scope);
       box.selected = !box.selected;
-
       //If a user selects a piece then get their posible moves
-      switch (box.piece.type) {
-        case "peon":
-          selectedBoxes = getPeonMoves(box, scope);
-          break;
-        case "queen":
-          selectedBoxes = getQueenMoves(box, scope);
-          break;
-        case "king":
-          selectedBoxes = getKingMoves(box, scope);
-          break;
-        case "tower":
-          selectedBoxes = getTowerMoves(box, scope);
-          break;
-        case "horse":
-          selectedBoxes = getHorseMoves(box, scope);
-          break;
-        case "bishop":
-          selectedBoxes = getBishopMoves(box, scope);
-          break;
-      }
+      selectedBoxes = getSelectedBoxes(box,scope);
       selectBoxes(selectedBoxes);
-    } else {//In any other case we clear the table
+    } else { //In any other case we clear the table
       clearTable(scope);
     }
   }
@@ -118,31 +114,31 @@ function getPeonMoves(box, scope) {
 
   var selectedBoxes = new Array();
 
-  if ((box.x + 1)<8 && scope.table[box.y][box.x + 1].piece === undefined && box.piece.color == 'black') { //Black move
+  if ((box.x + 1) < 8 && scope.table[box.y][box.x + 1].piece === undefined && box.piece.color == 'black') { //Black move
     selectedBoxes.push(scope.table[box.y][box.x + 1]);
-    if ((box.x + 2)<8 && scope.table[box.y][box.x + 2].piece === undefined && box.piece.firstMove == true) { //The firs time a peon can move 2 boxes
+    if ((box.x + 2) < 8 && scope.table[box.y][box.x + 2].piece === undefined && box.piece.firstMove == true) { //The firs time a peon can move 2 boxes
       selectedBoxes.push(scope.table[box.y][box.x + 2]);
     }
 
-  } else if ((box.x - 1)>=0 && scope.table[box.y][box.x - 1].piece === undefined && box.piece.color == 'white') { //White move
+  } else if ((box.x - 1) >= 0 && scope.table[box.y][box.x - 1].piece === undefined && box.piece.color == 'white') { //White move
     selectedBoxes.push(scope.table[box.y][box.x - 1]);
-    if ((box.x - 2)>=0 && scope.table[box.y][box.x - 2].piece === undefined && box.piece.firstMove == true) { //The firs time a peon can move 2 boxes
+    if ((box.x - 2) >= 0 && scope.table[box.y][box.x - 2].piece === undefined && box.piece.firstMove == true) { //The firs time a peon can move 2 boxes
       selectedBoxes.push(scope.table[box.y][box.x - 2]);
     }
   }
-  if((box.x + 1)<8 && (box.y+1)<8 && scope.table[box.y+1][box.x + 1].piece !== undefined && box.piece.color == 'black'){
-    selectedBoxes.push(scope.table[box.y+1][box.x + 1]);
-    scope.table[box.y+1][box.x + 1].piece.threatened=true;
-  }else if((box.x - 1)>=0 && (box.y+1)<8 && scope.table[box.y+1][box.x - 1].piece !== undefined && box.piece.color == 'white'){
-    selectedBoxes.push(scope.table[box.y+1][box.x - 1]);
-    scope.table[box.y+1][box.x - 1].piece.threatened=true;
+  if ((box.x + 1) < 8 && (box.y + 1) < 8 && scope.table[box.y + 1][box.x + 1].piece !== undefined && box.piece.color == 'black') {
+    selectedBoxes.push(scope.table[box.y + 1][box.x + 1]);
+    scope.table[box.y + 1][box.x + 1].piece.threatened = true;
+  } else if ((box.x - 1) >= 0 && (box.y + 1) < 8 && scope.table[box.y + 1][box.x - 1].piece !== undefined && box.piece.color == 'white') {
+    selectedBoxes.push(scope.table[box.y + 1][box.x - 1]);
+    scope.table[box.y + 1][box.x - 1].piece.threatened = true;
   }
-  if((box.x + 1)<8 && (box.y-1)>=0 && scope.table[box.y-1][box.x + 1].piece !== undefined && box.piece.color == 'black'){
-    selectedBoxes.push(scope.table[box.y-1][box.x + 1]);
-    scope.table[box.y-1][box.x + 1].piece.threatened=true;
-  }else if((box.x - 1)>=0 && (box.y-1)>=0 && scope.table[box.y-1][box.x - 1].piece !== undefined && box.piece.color == 'white'){
-    selectedBoxes.push(scope.table[box.y-1][box.x - 1]);
-    scope.table[box.y-1][box.x - 1].piece.threatened=true;
+  if ((box.x + 1) < 8 && (box.y - 1) >= 0 && scope.table[box.y - 1][box.x + 1].piece !== undefined && box.piece.color == 'black') {
+    selectedBoxes.push(scope.table[box.y - 1][box.x + 1]);
+    scope.table[box.y - 1][box.x + 1].piece.threatened = true;
+  } else if ((box.x - 1) >= 0 && (box.y - 1) >= 0 && scope.table[box.y - 1][box.x - 1].piece !== undefined && box.piece.color == 'white') {
+    selectedBoxes.push(scope.table[box.y - 1][box.x - 1]);
+    scope.table[box.y - 1][box.x - 1].piece.threatened = true;
   }
 
   return selectedBoxes;
@@ -165,7 +161,7 @@ function getQueenMoves(box, scope) {
       selectedBoxes.push(scope.table[box.y][box.x + i]);
     } else if (!rBlocked && (box.x + i) < 8 && scope.table[box.y][box.x + i] != undefined && scope.table[box.y][box.x + i].piece != undefined) {
       rBlocked = true;
-      if (scope.table[box.y][box.x + i].piece!=undefined && scope.table[box.y][box.x + i].piece.color != box.piece.color) {
+      if (scope.table[box.y][box.x + i].piece != undefined && scope.table[box.y][box.x + i].piece.color != box.piece.color) {
         selectedBoxes.push(scope.table[box.y][box.x + i]);
         scope.table[box.y][box.x + i].piece.threatened = true
       }
@@ -174,7 +170,7 @@ function getQueenMoves(box, scope) {
       selectedBoxes.push(scope.table[box.y][box.x - i]);
     } else if (!lBlocked && (box.x - i) >= 0 && scope.table[box.y][box.x - i] != undefined && scope.table[box.y][box.x - i].piece != undefined) {
       lBlocked = true;
-      if (scope.table[box.y][box.x - i].piece!=undefined && scope.table[box.y][box.x - i].piece.color != box.piece.color) {
+      if (scope.table[box.y][box.x - i].piece != undefined && scope.table[box.y][box.x - i].piece.color != box.piece.color) {
         selectedBoxes.push(scope.table[box.y][box.x - i]);
         scope.table[box.y][box.x - i].piece.threatened = true
       }
@@ -183,7 +179,7 @@ function getQueenMoves(box, scope) {
       selectedBoxes.push(scope.table[box.y + i][box.x]);
     } else if (!tBlocked && (box.y + i) < 8 && scope.table[box.y + i][box.x] != undefined && scope.table[box.y + i][box.x].piece != undefined) {
       tBlocked = true;
-      if (scope.table[box.y+i][box.x].piece!=undefined && scope.table[box.y + i][box.x].piece.color != box.piece.color) {
+      if (scope.table[box.y + i][box.x].piece != undefined && scope.table[box.y + i][box.x].piece.color != box.piece.color) {
         selectedBoxes.push(scope.table[box.y + i][box.x]);
         scope.table[box.y + i][box.x].piece.threatened = true
       }
@@ -192,7 +188,7 @@ function getQueenMoves(box, scope) {
       selectedBoxes.push(scope.table[box.y - i][box.x]);
     } else if (!bBlocked && (box.y - i) >= 0 && scope.table[box.y - i][box.x] != undefined && scope.table[box.y - i][box.x].piece != undefined) {
       bBlocked = true;
-      if (scope.table[box.y-i][box.x].piece!=undefined && scope.table[box.y - i][box.x].piece.color != box.piece.color) {
+      if (scope.table[box.y - i][box.x].piece != undefined && scope.table[box.y - i][box.x].piece.color != box.piece.color) {
         selectedBoxes.push(scope.table[box.y - i][box.x]);
         scope.table[box.y - i][box.x].piece.threatened = true
       }
@@ -201,7 +197,7 @@ function getQueenMoves(box, scope) {
       selectedBoxes.push(scope.table[box.y + i][box.x + i]);
     } else if (!rtBlocked && (box.y + i) < 8 && (box.x + i) < 8 && scope.table[box.y + i][box.x + i] != undefined && scope.table[box.y + i][box.x + i].piece != undefined) {
       rtBlocked = true;
-      if (scope.table[box.y + i][box.x + i].piece!=undefined && scope.table[box.y + i][box.x + i].piece.color != box.piece.color) {
+      if (scope.table[box.y + i][box.x + i].piece != undefined && scope.table[box.y + i][box.x + i].piece.color != box.piece.color) {
         selectedBoxes.push(scope.table[box.y + i][box.x + i]);
         scope.table[box.y + i][box.x + i].piece.threatened = true
       }
@@ -210,7 +206,7 @@ function getQueenMoves(box, scope) {
       selectedBoxes.push(scope.table[box.y - i][box.x + i]);
     } else if (!rbBlocked && (box.y - i) >= 0 && (box.x + i) < 8 && scope.table[box.y - i][box.x + i] != undefined && scope.table[box.y - i][box.x + i].piece != undefined) {
       rbBlocked = true;
-      if (scope.table[box.y - i][box.x + i].piece!=undefined && scope.table[box.y - i][box.x + i].piece.color != box.piece.color) {
+      if (scope.table[box.y - i][box.x + i].piece != undefined && scope.table[box.y - i][box.x + i].piece.color != box.piece.color) {
         selectedBoxes.push(scope.table[box.y - i][box.x + i]);
         scope.table[box.y - i][box.x + i].piece.threatened = true
       }
@@ -219,7 +215,7 @@ function getQueenMoves(box, scope) {
       selectedBoxes.push(scope.table[box.y + i][box.x - i]);
     } else if (!ltBlocked && (box.y + i) < 8 && (box.x - i) >= 0 && scope.table[box.y + i][box.x - i] != undefined && scope.table[box.y + i][box.x - i].piece != undefined) {
       ltBlocked = true;
-      if (scope.table[box.y + i][box.x - i].piece!=undefined && scope.table[box.y + i][box.x - i].piece.color != box.piece.color) {
+      if (scope.table[box.y + i][box.x - i].piece != undefined && scope.table[box.y + i][box.x - i].piece.color != box.piece.color) {
         selectedBoxes.push(scope.table[box.y + i][box.x - i]);
         scope.table[box.y + i][box.x - i].piece.threatened = true
       }
@@ -228,9 +224,9 @@ function getQueenMoves(box, scope) {
       selectedBoxes.push(scope.table[box.y - i][box.x - i]);
     } else if (!lbBlocked && (box.y - i) >= 0 && (box.x - i) >= 0 && scope.table[box.y - i][box.x - i] != undefined && scope.table[box.y - i][box.x - i].piece != undefined) {
       lbBlocked = true;
-      if (scope.table[box.y - i][box.x - i].piece!=undefined && scope.table[box.y - i][box.x - i].piece.color != box.piece.color) {
+      if (scope.table[box.y - i][box.x - i].piece != undefined && scope.table[box.y - i][box.x - i].piece.color != box.piece.color) {
         selectedBoxes.push(scope.table[box.y - i][box.x - i]);
-        scope.table[box.y - i][box.x - i].piece.threatened=true;
+        scope.table[box.y - i][box.x - i].piece.threatened = true;
       }
     }
   }
@@ -242,51 +238,51 @@ function getKingMoves(box, scope) {
   var selectedBoxes = new Array();
   //Selects the vertical
 
-  if ((box.x + 1) < 8 && scope.table[box.y][box.x + 1] != undefined && (scope.table[box.y][box.x+ 1].piece == undefined || scope.table[box.y][box.x + 1].piece.color != box.piece.color)) {
+  if ((box.x + 1) < 8 && scope.table[box.y][box.x + 1] != undefined && (scope.table[box.y][box.x + 1].piece == undefined || scope.table[box.y][box.x + 1].piece.color != box.piece.color)) {
     selectedBoxes.push(scope.table[box.y][box.x + 1]);
-    if (scope.table[box.y][box.x + 1].piece!=undefined && scope.table[box.y][box.x + 1].piece.color != box.piece.color) {
+    if (scope.table[box.y][box.x + 1].piece != undefined && scope.table[box.y][box.x + 1].piece.color != box.piece.color) {
       scope.table[box.y][box.x + 1].piece.threatened = true;
     }
   }
   if ((box.x - 1) >= 0 && scope.table[box.y][box.x - 1] != undefined && (scope.table[box.y][box.x - 1].piece == undefined || scope.table[box.y][box.x - 1].piece.color != box.piece.color)) {
     selectedBoxes.push(scope.table[box.y][box.x - 1]);
-    if (scope.table[box.y][box.x - 1].piece!=undefined && scope.table[box.y][box.x - 1].piece.color != box.piece.color) {
+    if (scope.table[box.y][box.x - 1].piece != undefined && scope.table[box.y][box.x - 1].piece.color != box.piece.color) {
       scope.table[box.y][box.x - 1].piece.threatened = true;
     }
   }
   if ((box.y + 1) < 8 && scope.table[box.y + 1][box.x] != undefined && (scope.table[box.y + 1][box.x].piece == undefined || scope.table[box.y + 1][box.x].piece.color != box.piece.color)) { //Selects the horizontal
     selectedBoxes.push(scope.table[box.y + 1][box.x]);
-    if (scope.table[box.y + 1][box.x].piece!=undefined && scope.table[box.y + 1][box.x].piece.color != box.piece.color) {
+    if (scope.table[box.y + 1][box.x].piece != undefined && scope.table[box.y + 1][box.x].piece.color != box.piece.color) {
       scope.table[box.y + 1][box.x].piece.threatened = true;
     }
   }
   if ((box.y - 1) >= 0 && scope.table[box.y - 1][box.x] != undefined && (scope.table[box.y - 1][box.x].piece == undefined || scope.table[box.y - 1][box.x].piece.color != box.piece.color)) { //Selects the horizontal
     selectedBoxes.push(scope.table[box.y - 1][box.x]);
-    if (scope.table[box.y - 1][box.x].piece!=undefined && scope.table[box.y - 1][box.x].piece.color != box.piece.color) {
+    if (scope.table[box.y - 1][box.x].piece != undefined && scope.table[box.y - 1][box.x].piece.color != box.piece.color) {
       scope.table[box.y - 1][box.x].piece.threatened = true;
     }
   }
   if ((box.x + 1) < 8 && (box.y + 1) < 8 && scope.table[box.y + 1][box.x + 1] != undefined && (scope.table[box.y + 1][box.x + 1].piece == undefined || scope.table[box.y + 1][box.x + 1].piece.color != box.piece.color)) { //Right top diagonal
     selectedBoxes.push(scope.table[box.y + 1][box.x + 1]);
-    if (scope.table[box.y + 1][box.x + 1].piece!=undefined && scope.table[box.y + 1][box.x + 1].piece.color != box.piece.color) {
+    if (scope.table[box.y + 1][box.x + 1].piece != undefined && scope.table[box.y + 1][box.x + 1].piece.color != box.piece.color) {
       scope.table[box.y + 1][box.x + 1].piece.threatened = true;
     }
   }
   if ((box.x + 1) < 8 && (box.y - 1) >= 0 && scope.table[box.y - 1][box.x + 1] != undefined && (scope.table[box.y - 1][box.x + 1].piece == undefined || scope.table[box.y - 1][box.x + 1].piece.color != box.piece.color)) { //Right button diagonal
     selectedBoxes.push(scope.table[box.y - 1][box.x + 1]);
-    if (scope.table[box.y - 1][box.x + 1].piece!=undefined && scope.table[box.y - 1][box.x + 1].piece.color != box.piece.color) {
+    if (scope.table[box.y - 1][box.x + 1].piece != undefined && scope.table[box.y - 1][box.x + 1].piece.color != box.piece.color) {
       scope.table[box.y - 1][box.x + 1].piece.threatened = true;
     }
   }
   if ((box.y + 1) < 8 && (box.x - 1) >= 0 && scope.table[box.y + 1][box.x - 1] != undefined && (scope.table[box.y + 1][box.x - 1].piece == undefined || scope.table[box.y + 1][box.x - 1].piece.color != box.piece.color)) { //Left top diagonal
     selectedBoxes.push(scope.table[box.y + 1][box.x - 1]);
-    if (scope.table[box.y + 1][box.x - 1].piece!=undefined && scope.table[box.y + 1][box.x - 1].piece.color != box.piece.color) {
+    if (scope.table[box.y + 1][box.x - 1].piece != undefined && scope.table[box.y + 1][box.x - 1].piece.color != box.piece.color) {
       scope.table[box.y + 1][box.x - 1].piece.threatened = true;
     }
   }
   if ((box.x - 1) >= 0 && (box.y - 1) >= 0 && scope.table[box.y - 1][box.x - 1] != undefined && (scope.table[box.y - 1][box.x - 1].piece == undefined || scope.table[box.y - 1][box.x - 1].piece.color != box.piece.color)) { //Left button diagonal
     selectedBoxes.push(scope.table[box.y - 1][box.x - 1]);
-    if (scope.table[box.y - 1][box.x - 1].piece!=undefined && scope.table[box.y - 1][box.x - 1].piece.color != box.piece.color) {
+    if (scope.table[box.y - 1][box.x - 1].piece != undefined && scope.table[box.y - 1][box.x - 1].piece.color != box.piece.color) {
       scope.table[box.y - 1][box.x - 1].piece.threatened = true;
     }
   }
@@ -306,7 +302,7 @@ function getTowerMoves(box, scope) {
       selectedBoxes.push(scope.table[box.y][box.x + i]);
     } else if (!rBlocked && (box.x + i) < 8 && scope.table[box.y][box.x + i] != undefined && scope.table[box.y][box.x + i].piece != undefined) {
       rBlocked = true;
-      if (scope.table[box.y][box.x + i].piece!=undefined && scope.table[box.y][box.x + i].piece.color != box.piece.color) {
+      if (scope.table[box.y][box.x + i].piece != undefined && scope.table[box.y][box.x + i].piece.color != box.piece.color) {
         selectedBoxes.push(scope.table[box.y][box.x + i]);
         scope.table[box.y][box.x + i].piece.threatened = true
       }
@@ -315,7 +311,7 @@ function getTowerMoves(box, scope) {
       selectedBoxes.push(scope.table[box.y][box.x - i]);
     } else if (!lBlocked && (box.x - i) >= 0 && scope.table[box.y][box.x - i] != undefined && scope.table[box.y][box.x - i].piece != undefined) {
       lBlocked = true;
-      if (scope.table[box.y][box.x - i].piece!=undefined && scope.table[box.y][box.x - i].piece.color != box.piece.color) {
+      if (scope.table[box.y][box.x - i].piece != undefined && scope.table[box.y][box.x - i].piece.color != box.piece.color) {
         selectedBoxes.push(scope.table[box.y][box.x - i]);
         scope.table[box.y][box.x - i].piece.threatened = true
       }
@@ -324,7 +320,7 @@ function getTowerMoves(box, scope) {
       selectedBoxes.push(scope.table[box.y + i][box.x]);
     } else if (!tBlocked && (box.y + i) < 8 && scope.table[box.y + i][box.x] != undefined && scope.table[box.y + i][box.x].piece != undefined) {
       tBlocked = true;
-      if (scope.table[box.y+i][box.x].piece!=undefined && scope.table[box.y + i][box.x].piece.color != box.piece.color) {
+      if (scope.table[box.y + i][box.x].piece != undefined && scope.table[box.y + i][box.x].piece.color != box.piece.color) {
         selectedBoxes.push(scope.table[box.y + i][box.x]);
         scope.table[box.y + i][box.x].piece.threatened = true
       }
@@ -333,7 +329,7 @@ function getTowerMoves(box, scope) {
       selectedBoxes.push(scope.table[box.y - i][box.x]);
     } else if (!bBlocked && (box.y - i) >= 0 && scope.table[box.y - i][box.x] != undefined && scope.table[box.y - i][box.x].piece != undefined) {
       bBlocked = true;
-      if (scope.table[box.y-i][box.x].piece!=undefined && scope.table[box.y - i][box.x].piece.color != box.piece.color) {
+      if (scope.table[box.y - i][box.x].piece != undefined && scope.table[box.y - i][box.x].piece.color != box.piece.color) {
         selectedBoxes.push(scope.table[box.y - i][box.x]);
         scope.table[box.y - i][box.x].piece.threatened = true
       }
@@ -355,7 +351,7 @@ function getBishopMoves(box, scope) {
       selectedBoxes.push(scope.table[box.y + i][box.x + i]);
     } else if (!rtBlocked && (box.y + i) < 8 && (box.x + i) < 8 && scope.table[box.y + i][box.x + i] != undefined && scope.table[box.y + i][box.x + i].piece != undefined) {
       rtBlocked = true;
-      if (scope.table[box.y + i][box.x + i].piece!=undefined && scope.table[box.y + i][box.x + i].piece.color != box.piece.color) {
+      if (scope.table[box.y + i][box.x + i].piece != undefined && scope.table[box.y + i][box.x + i].piece.color != box.piece.color) {
         selectedBoxes.push(scope.table[box.y + i][box.x + i]);
         scope.table[box.y + i][box.x + i].piece.threatened = true
       }
@@ -364,7 +360,7 @@ function getBishopMoves(box, scope) {
       selectedBoxes.push(scope.table[box.y - i][box.x + i]);
     } else if (!rbBlocked && (box.y - i) >= 0 && (box.x + i) < 8 && scope.table[box.y - i][box.x + i] != undefined && scope.table[box.y - i][box.x + i].piece != undefined) {
       rbBlocked = true;
-      if (scope.table[box.y - i][box.x + i].piece!=undefined && scope.table[box.y - i][box.x + i].piece.color != box.piece.color) {
+      if (scope.table[box.y - i][box.x + i].piece != undefined && scope.table[box.y - i][box.x + i].piece.color != box.piece.color) {
         selectedBoxes.push(scope.table[box.y - i][box.x + i]);
         scope.table[box.y - i][box.x + i].piece.threatened = true
       }
@@ -373,7 +369,7 @@ function getBishopMoves(box, scope) {
       selectedBoxes.push(scope.table[box.y + i][box.x - i]);
     } else if (!ltBlocked && (box.y + i) < 8 && (box.x - i) >= 0 && scope.table[box.y + i][box.x - i] != undefined && scope.table[box.y + i][box.x - i].piece != undefined) {
       ltBlocked = true;
-      if (scope.table[box.y + i][box.x - i].piece!=undefined && scope.table[box.y + i][box.x - i].piece.color != box.piece.color) {
+      if (scope.table[box.y + i][box.x - i].piece != undefined && scope.table[box.y + i][box.x - i].piece.color != box.piece.color) {
         selectedBoxes.push(scope.table[box.y + i][box.x - i]);
         scope.table[box.y + i][box.x - i].piece.threatened = true
       }
@@ -382,9 +378,9 @@ function getBishopMoves(box, scope) {
       selectedBoxes.push(scope.table[box.y - i][box.x - i]);
     } else if (!lbBlocked && (box.y - i) >= 0 && (box.x - i) >= 0 && scope.table[box.y - i][box.x - i] != undefined && scope.table[box.y - i][box.x - i].piece != undefined) {
       lbBlocked = true;
-      if (scope.table[box.y - i][box.x - i].piece!=undefined && scope.table[box.y - i][box.x - i].piece.color != box.piece.color) {
+      if (scope.table[box.y - i][box.x - i].piece != undefined && scope.table[box.y - i][box.x - i].piece.color != box.piece.color) {
         selectedBoxes.push(scope.table[box.y - i][box.x - i]);
-        scope.table[box.y - i][box.x - i].piece.threatened=true;
+        scope.table[box.y - i][box.x - i].piece.threatened = true;
       }
     }
   }
@@ -580,7 +576,7 @@ function clearTable(scope) {
   for (var i = 0; i < 8; i++) {
     for (var j = 0; j < 8; j++) {
       scope.table[i][j].selected = false;
-      if(scope.table[i][j].piece!=undefined){
+      if (scope.table[i][j].piece != undefined) {
         scope.table[i][j].piece.threatened = false;
       }
     }
@@ -593,30 +589,115 @@ function selectBoxes(selectedBoxes) {
   }
 }
 
-function getFirstTurn(){
+function getFirstTurn() {
   var color;
   var randNumb;
-  
+
   randNumb = Math.round(Math.random());
 
-  if(randNumb==1){
+  if (randNumb == 1) {
     color = "white";
-  }else{
-    color="black";
+  } else {
+    color = "black";
   }
 
   return color;
 }
 
-function getNextTurn(turn){
+function getNextTurn(turn) {
 
   var nxtTurn;
 
-  if(turn=="white"){
+  if (turn == "white") {
     nxtTurn = "black";
-  }else{
-    nxtTurn="white";
+  } else {
+    nxtTurn = "white";
   }
 
   return nxtTurn;
+}
+
+function isCheck(box) {
+
+  var isCheck;
+  var selectedBoxes = getSelectedBoxes(box);
+
+  for (var i = 0; i < selectBoxes.length; i++) {
+    if (selectedBoxes[i].piece != undefined && selectedBoxes[i].piece.type == "king") {
+      isCheck = selectedBoxes[i];
+      break;
+    }
+  }
+
+  return isCheck;
+}
+
+function getSelectedBoxes(box, scope) {
+  var selectedBoxes;
+
+  switch (box.piece.type) {
+    case "peon":
+      selectedBoxes = getPeonMoves(box, scope);
+      break;
+    case "queen":
+      selectedBoxes = getQueenMoves(box, scope);
+      break;
+    case "king":
+      selectedBoxes = getKingMoves(box, scope);
+      break;
+    case "tower":
+      selectedBoxes = getTowerMoves(box, scope);
+      break;
+    case "horse":
+      selectedBoxes = getHorseMoves(box, scope);
+      break;
+    case "bishop":
+      selectedBoxes = getBishopMoves(box, scope);
+      break;
+  }
+  return selectedBoxes;
+}
+
+function getBoxes(color,scope){
+
+  var table = scope.table;
+  var boxes = new Array();
+  for(var i=0;i<table.length;i++){
+    for(var j=0;j<table.length;j++){
+      if(table[i][j].piece!=undefined && table[i][j].piece.color==color){
+        boxes.push(table[i][j]);
+      } 
+    }
+  }
+
+  return boxes;
+}
+
+function getAnyCheck(scope){
+
+  var boxes = getBoxes(getNextTurn(scope.turn), scope);
+  var checkBox;
+
+  for(var i=0;i<boxes.length;i++){
+    if(isCheck(boxes[i])){
+      checkBox = boxes[i];
+    }
+  }
+  return checkBox;
+}
+
+function getMovesWithoutCheck(box,scope){
+
+  var moves = getKingMoves(box, scope);
+  var movesWithoutCheck = new Array();
+
+  for(var i=0;i<moves.length;i++){
+    moves[i].piece = box.piece;
+    if(getAnyCheck(scope)==undefined){
+      movesWithoutCheck.push(moves[i]);
+    }
+    moves[i].piece = undefined;
+  }
+  
+  return movesWithoutCheck;
 }
