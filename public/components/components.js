@@ -3,8 +3,9 @@ app.controller('myCtrl', function ($scope) {
 
   initiateFunctions($scope);
   $scope.table = init();
-  $scope.turn = getFirstTurn(); //Selects a color to iniciate the game
-
+  $scope.turn = getFirstTurn(); //Selects a color to iniciate the game  $scope.blackScore = 0;
+  $scope.blackScore = 0;
+  $scope.whiteScore = 0;
 });
 
 app.filter('range', function () {
@@ -59,7 +60,7 @@ function initiateFunctions(scope) {
      * Check that a user want to move a piece and is his turn
      */
     if (selectedPiece != undefined && selectedPiece.piece != undefined && box !== selectedPiece && scope.turn == selectedPiece.piece.color) {
-
+      
       //Checks that the user want to move to a selected box
       if (selectedBoxes.indexOf(box) != -1) {
 
@@ -72,26 +73,16 @@ function initiateFunctions(scope) {
             selectedPiece.piece.type = "queen";
           }
         }
-        
-        scope.table[box.y][box.x].piece = selectedPiece.piece;
 
-        if(isCheck(scope.table[box.y][box.x])){
-          scope.table[box.y][box.x].piece.check=true;
-          scope.checkBox = scope.table[box.y][box.x];
-          scope.table[selectedPiece.y][selectedPiece.x].piece = undefined;
-          scope.turn = getNextTurn(scope.turn);
-        }else if(scope.table[box.y][box.x].piece.type=="king" && getMovesWithoutCheck(scope.table[box.y][box.x]).length!=0){
-          scope.table[box.y][box.x].piece = undefined;
-        }else if(scope.table[box.y][box.x].piece.type=="king" && getMovesWithoutCheck(scope.table[box.y][box.x]).length==0){
-          scope.end = true;
-        }else{
-          scope.table[box.y][box.x].piece.check=false;
-          scope.checkPiece = undefined;
+          if(scope.turn=="black" && scope.table[box.y][box.x].piece!=undefined){
+            scope.blackScore +=getScore(scope.table[box.y][box.x]);
+          }else if(scope.turn=="white" && scope.table[box.y][box.x].piece!=undefined){
+            scope.whiteScore +=getScore(scope.table[box.y][box.x]);
+          }
+          scope.table[box.y][box.x].piece = selectedPiece.piece;          
           scope.table[selectedPiece.y][selectedPiece.x].piece = undefined;
           scope.turn = getNextTurn(scope.turn);
         }
-
-      }
 
       clearTable(scope);
     } else if (selectedPiece === undefined) { //Check that a user selected a box and there is no piece selected before
@@ -99,6 +90,7 @@ function initiateFunctions(scope) {
       box.selected = !box.selected;
       //If a user selects a piece then get their posible moves
       selectedBoxes = getSelectedBoxes(box,scope);
+      
       selectBoxes(selectedBoxes);
     } else { //In any other case we clear the table
       clearTable(scope);
@@ -126,17 +118,17 @@ function getPeonMoves(box, scope) {
       selectedBoxes.push(scope.table[box.y][box.x - 2]);
     }
   }
-  if ((box.x + 1) < 8 && (box.y + 1) < 8 && scope.table[box.y + 1][box.x + 1].piece !== undefined && box.piece.color == 'black') {
+  if ((box.x + 1) < 8 && (box.y + 1) < 8 && scope.table[box.y + 1][box.x + 1].piece !== undefined && box.piece.color == 'black' && scope.table[box.y + 1][box.x + 1].piece.color=="white") {
     selectedBoxes.push(scope.table[box.y + 1][box.x + 1]);
     scope.table[box.y + 1][box.x + 1].piece.threatened = true;
-  } else if ((box.x - 1) >= 0 && (box.y + 1) < 8 && scope.table[box.y + 1][box.x - 1].piece !== undefined && box.piece.color == 'white') {
+  } else if ((box.x - 1) >= 0 && (box.y + 1) < 8 && scope.table[box.y + 1][box.x - 1].piece !== undefined && box.piece.color == 'white'  && scope.table[box.y + 1][box.x + 1].piece.color=="black") {
     selectedBoxes.push(scope.table[box.y + 1][box.x - 1]);
     scope.table[box.y + 1][box.x - 1].piece.threatened = true;
   }
-  if ((box.x + 1) < 8 && (box.y - 1) >= 0 && scope.table[box.y - 1][box.x + 1].piece !== undefined && box.piece.color == 'black') {
+  if ((box.x + 1) < 8 && (box.y - 1) >= 0 && scope.table[box.y - 1][box.x + 1].piece !== undefined && box.piece.color == 'black' && scope.table[box.y - 1][box.x + 1].piece.color=="white") {
     selectedBoxes.push(scope.table[box.y - 1][box.x + 1]);
     scope.table[box.y - 1][box.x + 1].piece.threatened = true;
-  } else if ((box.x - 1) >= 0 && (box.y - 1) >= 0 && scope.table[box.y - 1][box.x - 1].piece !== undefined && box.piece.color == 'white') {
+  } else if ((box.x - 1) >= 0 && (box.y - 1) >= 0 && scope.table[box.y - 1][box.x - 1].piece !== undefined && box.piece.color == 'white' && scope.table[box.y - 1][box.x + 1].piece.color=="black") {
     selectedBoxes.push(scope.table[box.y - 1][box.x - 1]);
     scope.table[box.y - 1][box.x - 1].piece.threatened = true;
   }
@@ -617,20 +609,6 @@ function getNextTurn(turn) {
   return nxtTurn;
 }
 
-function isCheck(box) {
-
-  var isCheck;
-  var selectedBoxes = getSelectedBoxes(box);
-
-  for (var i = 0; i < selectBoxes.length; i++) {
-    if (selectedBoxes[i].piece != undefined && selectedBoxes[i].piece.type == "king") {
-      isCheck = selectedBoxes[i];
-      break;
-    }
-  }
-
-  return isCheck;
-}
 
 function getSelectedBoxes(box, scope) {
   var selectedBoxes;
@@ -658,6 +636,69 @@ function getSelectedBoxes(box, scope) {
   return selectedBoxes;
 }
 
+
+function contains(collection, value){
+  var result = false;
+  for(var i=0;i<collection.length;i++){
+      if(collection[i]==value){
+        result= true;
+        break;
+      }
+  }
+
+  return result;
+}
+
+function getScore(box){
+  var score;
+
+  switch (box.piece.type) {
+    case "peon":
+      score = 1;
+      break;
+    case "queen":
+      score = 9;
+      break;
+    case "tower":
+      score = 5;
+      break;
+    case "horse":
+      score = 3;
+      break;
+    case "bishop":
+      score = 3;
+      break;
+  }
+  return score;
+}
+
+
+
+function filterCheckMoves(moves,scope){
+
+  var enemyColor = getNextTurn(scope.turn);
+  var enemyBoxes = getBoxes(enemyColor, scope);
+  var deletedMoves = new Array();
+
+  for(var i=0;i<enemyBoxes.length;i++){
+    if(enemyBoxes[i].piece.type!="king"){
+      var enemyMoves = getSelectedBoxes(enemyBoxes[i], scope);
+      for(var j=0;j<moves.length;j++){
+        if(moves[j]!=undefined && contains(enemyMoves, moves[j]) && !contains(deletedMoves, moves[j])){
+          //window.alert(moves[j].x+", "+moves[j].y);
+          deletedMoves.push(moves[j]);
+        }
+      }
+    }
+  }
+
+  for(var k=0;k<deletedMoves.length;k++){
+    moves.splice(moves.indexOf(deletedMoves[k]),1);
+  }
+  // window.alert(moves);
+  return moves;
+}
+
 function getBoxes(color,scope){
 
   var table = scope.table;
@@ -671,33 +712,4 @@ function getBoxes(color,scope){
   }
 
   return boxes;
-}
-
-function getAnyCheck(scope){
-
-  var boxes = getBoxes(getNextTurn(scope.turn), scope);
-  var checkBox;
-
-  for(var i=0;i<boxes.length;i++){
-    if(isCheck(boxes[i])){
-      checkBox = boxes[i];
-    }
-  }
-  return checkBox;
-}
-
-function getMovesWithoutCheck(box,scope){
-
-  var moves = getKingMoves(box, scope);
-  var movesWithoutCheck = new Array();
-
-  for(var i=0;i<moves.length;i++){
-    moves[i].piece = box.piece;
-    if(getAnyCheck(scope)==undefined){
-      movesWithoutCheck.push(moves[i]);
-    }
-    moves[i].piece = undefined;
-  }
-  
-  return movesWithoutCheck;
 }

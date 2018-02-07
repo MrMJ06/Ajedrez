@@ -3,11 +3,25 @@
     height: 100%;
     background-color: rgb(131, 71, 2);
 }
-
+.turnwhite{
+    color : white;
+}
 .white {
     width: 100%;
     height: 100%;
-    background-color: rgb(194, 194, 194);
+    background-color: rgb(233, 233, 233);
+}
+.blackScore{
+    background-color: black;
+    color: white;
+    float: left;
+}
+.whiteScore{
+    background-color: rgb(235, 235, 235);
+    float: right;
+}
+.turn{
+    text-align: center;
 }
 
 h1{
@@ -39,4 +53,9 @@ h1{
     margin-left: 30%;
     width: 40vw;
     height: 40vw;
+}
+
+body{
+    background-color: rgb(155, 155, 155);
+    font-family: 'Lucida Sans', 'Lucida Sans Regular', 'Lucida Grande', 'Lucida Sans Unicode', Geneva, Verdana, sans-serif;
 }
