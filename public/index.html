@@ -15,12 +15,18 @@
 
     <div ng-app="myApp" ng-controller="myCtrl">
             <h2 class="turn">
-                    <div class="turn{{turn}}" ng-bind="turn"></div>
+                    <div class="turn{{turn}}" ng-if="!end && turn=='white'"> White</div>
+                    <div class="turn{{turn}}" ng-if="!end && turn=='black'"> Black</div>
                 </h2>
-            <div class="blackScore">Black score:{{blackScore}}
-                </div>
-                <div class="whiteScore">White score: {{whiteScore}}
-                </div>
+            <div class="blackScore">Black score: {{blackScore}}
+                <br/>
+                <div><div ng-if="blackTimer.seconds==0">Time:  {{blackTimer.minutes}}:0{{blackTimer.seconds}}</div><div ng-if="blackTimer.seconds!=0">Time:  {{blackTimer.minutes}}:{{blackTimer.seconds}}</div></div>
+            </div>
+            <div class="whiteScore">White score: {{whiteScore}}
+                <br/>
+                <div><div ng-if="whiteTimer.seconds==0">Time:  {{whiteTimer.minutes}}:0{{whiteTimer.seconds}}</div><div ng-if="whiteTimer.seconds!=0">Time:  {{whiteTimer.minutes}}:{{whiteTimer.seconds}}</div></div>
+            </div>
+            <h1><div class="winner{{turn}}" ng-if="end">{{turn}} player wins</div></h1>
         <div class="container">
             
            

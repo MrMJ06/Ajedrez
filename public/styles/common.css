@@ -1,23 +1,30 @@
 .black {
     width: 100%;
     height: 100%;
-    background-color: rgb(131, 71, 2);
+    background-color: rgb(83, 45, 2);
 }
 .turnwhite{
     color : white;
+    background-color: black;
+    border: 3px solid;
+}
+.turnblack{
+   border: 3px solid;
 }
 .white {
     width: 100%;
     height: 100%;
-    background-color: rgb(233, 233, 233);
+    background-color: rgb(207, 207, 207);
 }
 .blackScore{
     background-color: black;
+    padding: 5px;
     color: white;
     float: left;
 }
 .whiteScore{
-    background-color: rgb(235, 235, 235);
+    border: 3px solid;
+    padding: 5px;
     float: right;
 }
 .turn{
@@ -39,8 +46,12 @@ h1{
     height: 100%;
 }
 
-.true{
-    background-color: brown;
+.black.true{
+    background-color:  rgb(168, 36, 2);;
+}
+
+.white.true{
+    background-color: rgb(255, 164, 164);
 }
 
 .row{
@@ -55,7 +66,17 @@ h1{
     height: 40vw;
 }
 
+.winnerwhite{
+    text-align: center;
+    color:white;
+    background-color: black;
+}
+
+.winnerblack{
+    text-align: center;
+    color:black;
+}
 body{
-    background-color: rgb(155, 155, 155);
+    background-color:white;
     font-family: 'Lucida Sans', 'Lucida Sans Regular', 'Lucida Grande', 'Lucida Sans Unicode', Geneva, Verdana, sans-serif;
 }
