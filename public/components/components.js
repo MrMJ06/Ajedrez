@@ -1,21 +1,32 @@
 var app = angular.module('myApp', []);
 
-app.controller('myCtrl', function ($scope,$interval) {
+app.controller('myCtrl', function ($scope, $interval, $http) {
 
-  initiateFunctions($scope);
-  $scope.table = init();
-  $scope.turn = getFirstTurn(); //Selects a color to iniciate the game  $scope.blackScore = 0;
-  $scope.end = false;
-  $scope.blackScore = 0;
-  $scope.whiteScore = 0;
-  $scope.blackTimer = new Timer(30,0);
-  $scope.whiteTimer = new Timer(30,0);
-  if($scope.turn=="black"){
-    $interval(function(){$scope.blackTimer.subSecond($scope)},1000);
-  }else{
-    $interval(function(){$scope.whiteTimer.subSecond($scope)},1000);
+  $http.defaults.headers.post = { 'Content-Type':'application/json' };
+
+  $scope.game = {};
+  initiateFunctions($scope.game);
+  initiateDBFunctions($scope, $http);
+  $scope.game.table = init();
+  $scope.game.turn = getFirstTurn(); //Selects a color to iniciate the game  $scope.game.blackScore = 0;
+  $scope.game.end = false;
+  $scope.game.blackScore = 0;
+  $scope.game.whiteScore = 0;
+  $scope.game.blackTimer = new Timer(30, 0);
+  $scope.game.whiteTimer = new Timer(30, 0);
+
+
+
+  if ($scope.game.turn == "black") {
+    $interval(function () {
+      $scope.game.blackTimer.subSecond($scope.game)
+    }, 1000);
+  } else {
+    $interval(function () {
+      $scope.game.whiteTimer.subSecond($scope.game)
+    }, 1000);
   }
-  
+
 });
 
 
@@ -37,9 +48,9 @@ app.filter('range', function () {
  */
 
 function init() {
-  var table = new Array();
+  var table = [];
   for (var i = 0; i < 8; i++) {
-    var row = new Array();
+    var row = [];
     for (var j = 0; j < 8; j++) {
       row.push(putPiece(i, j)); //add the pieces
     }
@@ -71,7 +82,7 @@ function initiateFunctions(scope) {
      * Check that a user want to move a piece and is his turn
      */
     if (selectedPiece != undefined && selectedPiece.piece != undefined && box !== selectedPiece && scope.turn == selectedPiece.piece.color && !scope.end) {
-      
+
       //Checks that the user want to move to a selected box
       if (selectedBoxes.indexOf(box) != -1) {
 
@@ -85,34 +96,49 @@ function initiateFunctions(scope) {
           }
         }
 
-          if(scope.turn=="black" && scope.table[box.y][box.x].piece!=undefined){
-            scope.blackScore +=getScore(scope.table[box.y][box.x]);
-          }else if(scope.turn=="white" && scope.table[box.y][box.x].piece!=undefined){
-            scope.whiteScore +=getScore(scope.table[box.y][box.x]);
-          }
-
-          if(scope.table[box.y][box.x].piece!=null && scope.table[box.y][box.x].piece.type=="king"){
-            scope.end=true;
-          }else{
-            scope.turn = getNextTurn(scope.turn);
-          }
-
-          scope.table[box.y][box.x].piece = selectedPiece.piece;          
-          scope.table[selectedPiece.y][selectedPiece.x].piece = undefined;
+        if (scope.turn == "black" && scope.table[box.y][box.x].piece != undefined) {
+          scope.blackScore += getScore(scope.table[box.y][box.x]);
+        } else if (scope.turn == "white" && scope.table[box.y][box.x].piece != undefined) {
+          scope.whiteScore += getScore(scope.table[box.y][box.x]);
         }
+
+        if (scope.table[box.y][box.x].piece != null && scope.table[box.y][box.x].piece.type == "king") {
+          scope.end = true;
+        } else {
+          scope.turn = getNextTurn(scope.turn);
+        }
+
+        scope.table[box.y][box.x].piece = selectedPiece.piece;
+        scope.table[selectedPiece.y][selectedPiece.x].piece = undefined;
+      }
 
       clearTable(scope);
     } else if (selectedPiece === undefined && !scope.end) { //Check that a user selected a box and there is no piece selected before
       clearTable(scope);
       box.selected = !box.selected;
       //If a user selects a piece then get their posible moves
-      selectedBoxes = getSelectedBoxes(box,scope);
-      
+      selectedBoxes = getSelectedBoxes(box, scope);
+
       selectBoxes(selectedBoxes);
     } else { //In any other case we clear the table
       clearTable(scope);
     }
-  }
+  };
+}
+
+function initiateDBFunctions(scope, http) {
+  scope.save = function () {
+    http({
+      method:'POST',
+      url:'http://localhost:8081/save',
+      data: scope.game,
+      headers: {'Content-Type': 'application/x-www-form-urlencoded'}
+    }).success(function(response){
+      window.alert(JSON.stringify(response,null, 4));
+    }).error(function(response){
+      window.alert("Error: "+JSON.stringify(response,null, 4));
+    });
+  };
 }
 
 /**
@@ -135,17 +161,17 @@ function getPeonMoves(box, scope) {
       selectedBoxes.push(scope.table[box.y][box.x - 2]);
     }
   }
-  if ((box.x + 1) < 8 && (box.y + 1) < 8 && scope.table[box.y + 1][box.x + 1].piece !== undefined && box.piece.color == 'black' && scope.table[box.y + 1][box.x + 1].piece.color=="white") {
+  if ((box.x + 1) < 8 && (box.y + 1) < 8 && scope.table[box.y + 1][box.x + 1].piece !== undefined && box.piece.color == 'black' && scope.table[box.y + 1][box.x + 1].piece.color == "white") {
     selectedBoxes.push(scope.table[box.y + 1][box.x + 1]);
     scope.table[box.y + 1][box.x + 1].piece.threatened = true;
-  } else if ((box.x - 1) >= 0 && (box.y + 1) < 8 && scope.table[box.y + 1][box.x - 1].piece !== undefined && box.piece.color == 'white'  && scope.table[box.y + 1][box.x -1].piece.color=="black") {
+  } else if ((box.x - 1) >= 0 && (box.y + 1) < 8 && scope.table[box.y + 1][box.x - 1].piece !== undefined && box.piece.color == 'white' && scope.table[box.y + 1][box.x - 1].piece.color == "black") {
     selectedBoxes.push(scope.table[box.y + 1][box.x - 1]);
     scope.table[box.y + 1][box.x - 1].piece.threatened = true;
   }
-  if ((box.x + 1) < 8 && (box.y - 1) >= 0 && scope.table[box.y - 1][box.x + 1].piece !== undefined && box.piece.color == 'black' && scope.table[box.y - 1][box.x + 1].piece.color=="white") {
+  if ((box.x + 1) < 8 && (box.y - 1) >= 0 && scope.table[box.y - 1][box.x + 1].piece !== undefined && box.piece.color == 'black' && scope.table[box.y - 1][box.x + 1].piece.color == "white") {
     selectedBoxes.push(scope.table[box.y - 1][box.x + 1]);
     scope.table[box.y - 1][box.x + 1].piece.threatened = true;
-  } else if ((box.x - 1) >= 0 && (box.y - 1) >= 0 && scope.table[box.y - 1][box.x - 1].piece !== undefined && box.piece.color == 'white' && scope.table[box.y - 1][box.x - 1].piece.color=="black") {
+  } else if ((box.x - 1) >= 0 && (box.y - 1) >= 0 && scope.table[box.y - 1][box.x - 1].piece !== undefined && box.piece.color == 'white' && scope.table[box.y - 1][box.x - 1].piece.color == "black") {
     selectedBoxes.push(scope.table[box.y - 1][box.x - 1]);
     scope.table[box.y - 1][box.x - 1].piece.threatened = true;
   }
@@ -654,19 +680,19 @@ function getSelectedBoxes(box, scope) {
 }
 
 
-function contains(collection, value){
+function contains(collection, value) {
   var result = false;
-  for(var i=0;i<collection.length;i++){
-      if(collection[i]==value){
-        result= true;
-        break;
-      }
+  for (var i = 0; i < collection.length; i++) {
+    if (collection[i] == value) {
+      result = true;
+      break;
+    }
   }
 
   return result;
 }
 
-function getScore(box){
+function getScore(box) {
   var score;
 
   switch (box.piece.type) {
@@ -694,17 +720,17 @@ function getScore(box){
 
 
 
-function filterCheckMoves(moves,scope){
+function filterCheckMoves(moves, scope) {
 
   var enemyColor = getNextTurn(scope.turn);
   var enemyBoxes = getBoxes(enemyColor, scope);
   var deletedMoves = new Array();
 
-  for(var i=0;i<enemyBoxes.length;i++){
-    if(enemyBoxes[i].piece.type!="king"){
+  for (var i = 0; i < enemyBoxes.length; i++) {
+    if (enemyBoxes[i].piece.type != "king") {
       var enemyMoves = getSelectedBoxes(enemyBoxes[i], scope);
-      for(var j=0;j<moves.length;j++){
-        if(moves[j]!=undefined && contains(enemyMoves, moves[j]) && !contains(deletedMoves, moves[j])){
+      for (var j = 0; j < moves.length; j++) {
+        if (moves[j] != undefined && contains(enemyMoves, moves[j]) && !contains(deletedMoves, moves[j])) {
           //window.alert(moves[j].x+", "+moves[j].y);
           deletedMoves.push(moves[j]);
         }
@@ -712,22 +738,22 @@ function filterCheckMoves(moves,scope){
     }
   }
 
-  for(var k=0;k<deletedMoves.length;k++){
-    moves.splice(moves.indexOf(deletedMoves[k]),1);
+  for (var k = 0; k < deletedMoves.length; k++) {
+    moves.splice(moves.indexOf(deletedMoves[k]), 1);
   }
   // window.alert(moves);
   return moves;
 }
 
-function getBoxes(color,scope){
+function getBoxes(color, scope) {
 
   var table = scope.table;
   var boxes = new Array();
-  for(var i=0;i<table.length;i++){
-    for(var j=0;j<table.length;j++){
-      if(table[i][j].piece!=undefined && table[i][j].piece.color==color){
+  for (var i = 0; i < table.length; i++) {
+    for (var j = 0; j < table.length; j++) {
+      if (table[i][j].piece != undefined && table[i][j].piece.color == color) {
         boxes.push(table[i][j]);
-      } 
+      }
     }
   }
 
@@ -735,38 +761,38 @@ function getBoxes(color,scope){
 }
 
 
-class Timer{
-  constructor(minutes, seconds){
-      this.minutes = minutes;
-      this.seconds = seconds;
+class Timer {
+  constructor(minutes, seconds) {
+    this.minutes = minutes;
+    this.seconds = seconds;
   }
 
-  
+
 }
 
-Timer.prototype.subSecond = function subSecond(scope){
-   if(this.seconds==0 && this.minutes==0){
-       scope.end=true;
-       getWinner(scope);
-   }else if(this.seconds==0){
-       this.minutes=this.minutes-1;
-       this.seconds=59;
-   }else{
-       this.seconds=this.seconds-1;
-   }
+Timer.prototype.subSecond = function subSecond(scope) {
+  if (this.seconds == 0 && this.minutes == 0) {
+    scope.end = true;
+    getWinner(scope);
+  } else if (this.seconds == 0) {
+    this.minutes = this.minutes - 1;
+    this.seconds = 59;
+  } else {
+    this.seconds = this.seconds - 1;
+  }
 }
 
 
-function getWinner(scope){
-  if(scope.whiteScore>scope.blackScore){
-      scope.turn = "white";
-  }else if(scope.whiteScore<scope.blackScore){
-      scope.turn="black"
-  }else{
-      if(scope.turn=="white"){
-          scope.turn="black";
-      }else{
-          scope.turn="white"
-      }
+function getWinner(scope) {
+  if (scope.whiteScore > scope.blackScore) {
+    scope.turn = "white";
+  } else if (scope.whiteScore < scope.blackScore) {
+    scope.turn = "black"
+  } else {
+    if (scope.turn == "white") {
+      scope.turn = "black";
+    } else {
+      scope.turn = "white"
+    }
   }
 }

@@ -12,15 +12,6 @@ var path = require('path');
 var app = express();
 var port = 8080;
 var path = path.join(__dirname,"/public/index.html");
-
-
-/**
- * Database configuration
- */
-
-
-
-
 /**
  * Server configuration
  */
