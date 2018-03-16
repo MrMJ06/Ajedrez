@@ -1,0 +1,15 @@
+<div>
+    <form>
+        <label for="title">
+            Title
+        </label>
+        <input name="title" type="text" ng-model="game.title" />
+        <label for="time">
+            Time
+        </label>
+        <input name="time" type="number" ng-model="game.time" />
+
+        <input type="submit" value="create" ng-click="game.saveGame();">
+    </form>
+    {{time}}
+</div>

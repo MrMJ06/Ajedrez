@@ -1,0 +1,63 @@
+<div>
+    <h2 class="turn">
+        <div class="turn{{game.turn}}" ng-if="!game.end && game.turn=='white'"> White</div>
+        <div class="turn{{game.turn}}" ng-if="!game.end && game.turn=='black'"> Black</div>
+    </h2>
+    <div class="blackScore">Black score: {{game.blackScore}} {{time}}
+        <br/>
+        <div ng-if="game.blackTimer!=undefined">
+            <div ng-if="game.blackTimer.seconds==0">Time: {{game.blackTimer.minutes}}:0{{game.blackTimer.seconds}}</div>
+            <div ng-if="game.blackTimer.seconds!=0">Time: {{game.blackTimer.minutes}}:{{game.blackTimer.seconds}}</div>
+        </div>
+    </div>
+    <div class="whiteScore">White score: {{game.whiteScore}}
+        <br/>
+        <div ng-if="game.whiteTimer!=undefined">
+            <div ng-if="game.whiteTimer.seconds==0">Time: {{game.whiteTimer.minutes}}:0{{game.whiteTimer.seconds}}</div>
+            <div ng-if="game.whiteTimer.seconds!=0">Time: {{game.whiteTimer.minutes}}:{{game.whiteTimer.seconds}}</div>
+        </div>
+    </div>
+    <h1>
+        <div class="winner{{game.turn}}" ng-if="game.end">{{game.turn}} player wins</div>
+    </h1>
+
+    <div>
+        <button ng-click="save()">Save status</button>
+    </div>
+
+    <div class="container">
+        <div class="row" ng-repeat="row in game.table">
+            <div class="col" ng-repeat="box in row">
+                <div id="{{box.x*10+box.y}}" class="black {{box.selected}}" ng-if="(box.x+box.y)%2==1" ng-click="game.selectBox(box);">
+                    <image class="img" src="images/peon.png" ng-if=" box.piece.type=='peon' && box.piece.color=='black'" />
+                    <image class="img" src="images/queen.png" ng-if="box.piece.type=='queen' && box.piece.color=='black'" />
+                    <image class="img" src="images/king.png" ng-if="box.piece.type=='king' && box.piece.color=='black'" />
+                    <image class="img" src="images/tower.png" ng-if="box.piece.type=='tower' && box.piece.color=='black'" />
+                    <image class="img" src="images/bishop.png" ng-if="box.piece.type=='bishop' && box.piece.color=='black'" />
+                    <image class="img" src="images/horse.png" ng-if="box.piece.type=='horse' && box.piece.color=='black'" />
+                    <image class="img" src="images/peon_white.png" ng-if=" box.piece.type=='peon' && box.piece.color=='white'" />
+                    <image class="img" src="images/queen_white.png" ng-if=" box.piece.type=='queen' && box.piece.color=='white'" />
+                    <image class="img" src="images/king_white.png" ng-if=" box.piece.type=='king' && box.piece.color=='white'" />
+                    <image class="img" src="images/tower_white.png" ng-if=" box.piece.type=='tower' && box.piece.color=='white'" />
+                    <image class="img" src="images/bishop_white.png" ng-if=" box.piece.type=='bishop' && box.piece.color=='white'" />
+                    <image class="img" src="images/horse_white.png" ng-if=" box.piece.type=='horse' && box.piece.color=='white'" />
+                </div>
+                <div id="{{box.x*10+box.y}}" class="white {{box.selected}}" ng-if="(box.x+box.y)%2==0" ng-click="game.selectBox(box);">
+                    <image class="img" src="images/peon_white.png" ng-if=" box.piece.type=='peon' && box.piece.color=='white'" />
+                    <image class="img" src="images/queen_white.png" ng-if=" box.piece.type=='queen' && box.piece.color=='white'" />
+                    <image class="img" src="images/king_white.png" ng-if=" box.piece.type=='king' && box.piece.color=='white'" />
+                    <image class="img" src="images/tower_white.png" ng-if=" box.piece.type=='tower' && box.piece.color=='white'" />
+                    <image class="img" src="images/bishop_white.png" ng-if=" box.piece.type=='bishop' && box.piece.color=='white'" />
+                    <image class="img" src="images/horse_white.png" ng-if=" box.piece.type=='horse' && box.piece.color=='white'" />
+                    <image class="img" src="images/peon.png" ng-if=" box.piece.type=='peon' && box.piece.color=='black'" />
+                    <image class="img" src="images/queen.png" ng-if="box.piece.type=='queen' && box.piece.color=='black'" />
+                    <image class="img" src="images/king.png" ng-if="box.piece.type=='king' && box.piece.color=='black'" />
+                    <image class="img" src="images/tower.png" ng-if="box.piece.type=='tower' && box.piece.color=='black'" />
+                    <image class="img" src="images/bishop.png" ng-if="box.piece.type=='bishop' && box.piece.color=='black'" />
+                    <image class="img" src="images/horse.png" ng-if="box.piece.type=='horse' && box.piece.color=='black'" />
+                </div>
+            </div>
+        </div>
+    </div>
+
+</div>

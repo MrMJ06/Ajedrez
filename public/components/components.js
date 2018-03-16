@@ -1,33 +1,65 @@
-var app = angular.module('myApp', []);
+var app = angular.module('myApp', ['ngRoute']);
 
-app.controller('myCtrl', function ($scope, $interval, $http) {
+app.config(function ($routeProvider, $locationProvider) {
+  //$locationProvider.html5Mode(true);
+  $locationProvider.hashPrefix('');
 
-  $http.defaults.headers.post = {
-    'Content-Type': 'application/json'
+  $routeProvider.when('/', {
+    controller: 'myCtrl',
+    templateUrl: '../home.html'
+  }).when('/create', {
+    controller: 'myCtrl',
+    templateUrl: '../create.html'
+  }).when('/chess', {
+    controller: 'myCtrl',
+    templateUrl: '../chess.html'
+  });
+
+});
+
+app.factory("data", function () {
+  var storage = {};
+  return {
+    get: function () {
+      return storage;
+    },
+    set: function (toSet) {
+      storage = toSet;
+      return storage;
+    }
   };
+});
+
+
+app.controller('myCtrl', function ($rootScope, $scope, $interval, $http, $location, data) {
 
   $scope.game = {};
-  initiateFunctions($scope.game);
+  $scope.gameData = data.get();
+
+  initiateFunctions($scope.game, $location, data);
   initiateDBFunctions($scope, $http);
   $scope.game.table = init();
   $scope.game.turn = getFirstTurn(); //Selects a color to iniciate the game  $scope.game.blackScore = 0;
+
   $scope.game.end = false;
   $scope.game.blackScore = 0;
   $scope.game.whiteScore = 0;
-  $scope.game.blackTimer = new Timer(30, 0);
-  $scope.game.whiteTimer = new Timer(30, 0);
+  //window.alert(JSON.stringify($scope.data, null, 4));
 
+  if ($scope.gameData.time != undefined) {
+    $scope.game.blackTimer = new Timer($scope.gameData.time, 0);
+    $scope.game.whiteTimer = new Timer($scope.gameData.time, 0);
 
-  if ($scope.game.turn == "black" && !$scope.game.end) {
     $interval(function () {
-      $scope.game.blackTimer.subSecond($scope.game);
-    }, 1000);
-  } else if(!$scope.game.end) {//TODO: Revisar
-    $interval(function () {
-      $scope.game.whiteTimer.subSecond($scope.game);
+      if ($scope.game.blackTimer != undefined) {
+        if ($scope.game.turn == "black" && !$scope.game.end) {
+          $scope.game.blackTimer.subSecond($scope.game);
+        } else if (!$scope.game.end) {
+          $scope.game.whiteTimer.subSecond($scope.game);
+        }
+      }
     }, 1000);
   }
-
 });
 
 
@@ -47,7 +79,12 @@ function init() {
   return table;
 }
 
-function initiateFunctions(scope) {
+function initiateFunctions(scope, location, data) {
+
+  scope.saveGame = function () {
+    data.set({title: scope.title, time: scope.time});
+    location.path('/chess');
+  };
 
   scope.selectBox = function (box) {
     let selectedPiece;
@@ -120,6 +157,7 @@ function initiateDBFunctions(scope, http) {
    * Saving game
    */
   scope.save = function () {
+    scope.game.moment = new Date();
     http({
       method: 'POST',
       url: 'http://localhost:3000/save',
@@ -131,6 +169,21 @@ function initiateDBFunctions(scope, http) {
     }).success(function (response) {
       window.alert(JSON.stringify(response, null, 4));
     }).error(function (response) {
+      window.alert("Error: " + JSON.stringify(response, null, 4));
+    });
+  };
+
+  /**
+   * Saving game
+   */
+  scope.getGames = function () {
+    http({
+      method: 'GET',
+      url: 'http://localhost:3000/findAll',
+    }).then(function (response) {
+      window.alert(JSON.stringify(response.data, null, 4));
+      scope.gameList = response.data;
+    }, function (response) {
       window.alert("Error: " + JSON.stringify(response, null, 4));
     });
   };
