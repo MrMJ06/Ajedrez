@@ -20,11 +20,20 @@
     <h1>
         <div class="winner{{game.turn}}" ng-if="game.end">{{game.turn}} player wins</div>
     </h1>
-
+    <br/>
     <div>
         <button ng-click="save()">Save status</button>
     </div>
-
+    <div class="chatBox">
+        <div class="containerChat">
+            <ul>
+                <li ng-repeat="message in game.chat">
+                    {{message}}
+                </li>
+            </ul>
+            <input type="text" ng-model="game.newMessage" ng-keypress="game.insertMessage($event);" />
+        </div>
+    </div>
     <div class="container">
         <div class="row" ng-repeat="row in game.table">
             <div class="col" ng-repeat="box in row">

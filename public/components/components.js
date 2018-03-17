@@ -1,19 +1,24 @@
-var app = angular.module('myApp', ['ngRoute']);
+var app = angular.module('myApp', ['ngRoute','ui.router']);
 
-app.config(function ($routeProvider, $locationProvider) {
+app.config(function ($stateProvider, $locationProvider, $urlRouterProvider) {
   //$locationProvider.html5Mode(true);
   $locationProvider.hashPrefix('');
 
-  $routeProvider.when('/', {
+  $stateProvider.state('home', {
+    url:'/home',
     controller: 'myCtrl',
     templateUrl: '../home.html'
-  }).when('/create', {
+  }).state('create', {
+    url:'/create',
     controller: 'myCtrl',
     templateUrl: '../create.html'
-  }).when('/chess', {
+  }).state('chess', {
+    url:'/chess',
     controller: 'myCtrl',
     templateUrl: '../chess.html'
   });
+
+  $urlRouterProvider.otherwise('/home');
 
 });
 
@@ -34,6 +39,7 @@ app.factory("data", function () {
 app.controller('myCtrl', function ($rootScope, $scope, $interval, $http, $location, data) {
 
   $scope.game = {};
+  $scope.game.chat = new Array();
   $scope.gameData = data.get();
 
   initiateFunctions($scope.game, $location, data);
@@ -81,6 +87,12 @@ function init() {
 
 function initiateFunctions(scope, location, data) {
 
+  scope.insertMessage = function(event){
+     if(event.keyCode == 13) {
+       scope.chat.push(scope.newMessage);
+       scope.newMessage = null;
+     }
+  };
   scope.saveGame = function () {
     data.set({title: scope.title, time: scope.time});
     location.path('/chess');
