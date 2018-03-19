@@ -1,42 +1,46 @@
-<div>
-    <h2 class="turn">
+<div id="game">
+    <div class="row">
+        <div class="blackScore col">Black score: {{game.blackScore}} {{time}}
+            <br/>
+            <div ng-if="game.blackTimer!=undefined">
+                <div ng-if="game.blackTimer.seconds==0">Time: {{game.blackTimer.minutes}}:0{{game.blackTimer.seconds}}</div>
+                <div ng-if="game.blackTimer.seconds!=0">Time: {{game.blackTimer.minutes}}:{{game.blackTimer.seconds}}</div>
+            </div>
+        </div>
+        <div class="whiteScore col">White score: {{game.whiteScore}}
+            <br/>
+            <div ng-if="game.whiteTimer!=undefined">
+                <div ng-if="game.whiteTimer.seconds==0">Time: {{game.whiteTimer.minutes}}:0{{game.whiteTimer.seconds}}</div>
+                <div ng-if="game.whiteTimer.seconds!=0">Time: {{game.whiteTimer.minutes}}:{{game.whiteTimer.seconds}}</div>
+            </div>
+        </div>
+    </div>
+    <div class="row">
+        <h1 class="col">
+            <div class="winner{{game.turn}} col" ng-if="game.end">{{game.turn}} player wins</div>
+        </h1>
+        <br/>
+    </div>
+</div>
+<div class="row">
+    <h2 class="turn col">
         <div class="turn{{game.turn}}" ng-if="!game.end && game.turn=='white'"> White</div>
         <div class="turn{{game.turn}}" ng-if="!game.end && game.turn=='black'"> Black</div>
     </h2>
-    <div class="blackScore">Black score: {{game.blackScore}} {{time}}
-        <br/>
-        <div ng-if="game.blackTimer!=undefined">
-            <div ng-if="game.blackTimer.seconds==0">Time: {{game.blackTimer.minutes}}:0{{game.blackTimer.seconds}}</div>
-            <div ng-if="game.blackTimer.seconds!=0">Time: {{game.blackTimer.minutes}}:{{game.blackTimer.seconds}}</div>
+</div>
+<div class="row justify-content-start">
+    <div class="col col-3">
+        <div id="chatBox" class="chatBox">
+            <p ng-repeat="message in game.chat">
+                {{message}}
+            </p>
         </div>
+        <input type="text" ng-model="game.newMessage" ng-keypress="game.insertMessage($event);" />
     </div>
-    <div class="whiteScore">White score: {{game.whiteScore}}
-        <br/>
-        <div ng-if="game.whiteTimer!=undefined">
-            <div ng-if="game.whiteTimer.seconds==0">Time: {{game.whiteTimer.minutes}}:0{{game.whiteTimer.seconds}}</div>
-            <div ng-if="game.whiteTimer.seconds!=0">Time: {{game.whiteTimer.minutes}}:{{game.whiteTimer.seconds}}</div>
-        </div>
-    </div>
-    <h1>
-        <div class="winner{{game.turn}}" ng-if="game.end">{{game.turn}} player wins</div>
-    </h1>
-    <br/>
-    <div>
-        <button ng-click="save()">Save status</button>
-    </div>
-    <div class="chatBox">
-        <div class="containerChat">
-            <ul>
-                <li ng-repeat="message in game.chat">
-                    {{message}}
-                </li>
-            </ul>
-            <input type="text" ng-model="game.newMessage" ng-keypress="game.insertMessage($event);" />
-        </div>
-    </div>
-    <div class="container">
-        <div class="row" ng-repeat="row in game.table">
-            <div class="col" ng-repeat="box in row">
+
+    <div id="chessContainer" class="chessContainer col col-6">
+        <div class="chessRow" ng-repeat="row in game.table">
+            <div class="chessCol" ng-repeat="box in row">
                 <div id="{{box.x*10+box.y}}" class="black {{box.selected}}" ng-if="(box.x+box.y)%2==1" ng-click="game.selectBox(box);">
                     <image class="img" src="images/peon.png" ng-if=" box.piece.type=='peon' && box.piece.color=='black'" />
                     <image class="img" src="images/queen.png" ng-if="box.piece.type=='queen' && box.piece.color=='black'" />
@@ -68,5 +72,9 @@
             </div>
         </div>
     </div>
+    <div class="saveStatus col-1">
+        <button class="btn btn-outline-info" ng-click="save()" onclick="screenshot();">Save status</button>
+    </div>
+</div>
 
 </div>

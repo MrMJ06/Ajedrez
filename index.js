@@ -16,6 +16,9 @@ var port = 8080;
  */
 
 app.use(express.static(__dirname+"/public"));
+app.use("/scripts",express.static(__dirname+"/node_modules/bootstrap/dist"));
+app.use("/scripts",express.static(__dirname+"/node_modules/jquery/dist"));
+app.use("/scripts",express.static(__dirname+"/node_modules/html2canvas/dist"));
 
 // app.get('/', function(request, response){
 //     console.log(__dirname + '/index.html');

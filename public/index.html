@@ -6,12 +6,14 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta http-equiv="X-UA-Compatible" content="ie=edge">
     <link rel="stylesheet" href="styles/common.css" type="text/css">
-    
+    <link rel="stylesheet" href="/scripts/css/bootstrap.min.css" type="text/css">
+
     <script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.6.4/angular.min.js"></script>
     <script src="//unpkg.com/@uirouter/angularjs/release/angular-ui-router.min.js"></script>
-    <script src="/node_modules/jquery/dist/jquery.min.js"></script>
-    <script src="/node_modules/html2canvas/dist/html2canvas.min.js"></script>
     <script src="http://code.angularjs.org/1.2.1/angular-route.min.js"></script>
+    <script src="/scripts/jquery.min.js"></script>
+    <script src="/scripts/js/bootstrap.min.js"></script>
+    <script src="/scripts/html2canvas.min.js"></script>
     <script src="components/components.js"></script>
     <script src="scripts.js"></script>
 
@@ -20,17 +22,15 @@
 </head>
 
 <body ng-app="myApp">
-        <nav>
-            <ul>
-                <li><button ui-sref="home" />Home</button></li>
-                <li><button ui-sref="create"/>Create game</button></li>
-                <li><button ui-sref="chess" />Play</button></li>
-            </ul>
-        </nav>
-        <button onclick="screenshot();">screenshot</button>
+    <nav class="navbar navbar-light bg-light">
+        <div >
+            <a class="nav-item btn btn-outline-dark"  ui-sref="home" />Home</a>
+            <a class="nav-item btn btn-outline-dark"  ui-sref="create" />Create game</a>
+            <a class="nav-item btn btn-outline-dark" ui-sref="chess" />Play</a>
+        </div>
+    </nav>
 
         <div ui-view>
-
         </div>
 </body>
 

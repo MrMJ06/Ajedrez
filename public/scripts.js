@@ -2,10 +2,8 @@ var html2canvas = require("html2canvas");
 
 function screenshot() {
     window.alert("shot");
-    html2canvas(document.body, {
-        onrendered: function (canvas) {
-            window.alert(canvas.toDataURL('image/png'));
-            document.body.appendChild(canvas.toDataURL('image/png'));
+    html2canvas(document.getElementById("chessContainer")).then(function (canvas) {
+            window.canvasUrl = canvas.toDataURL('image/png');
         }
-    });
+    );
 }

@@ -37,6 +37,7 @@
         "@uirouter/angularjs": "^1.0.15",
         "angular-route": "^1.6.4",
         "angular-screenshot": "^0.4.1",
+        "bootstrap": "^4.0.0",
         "express": "^4.16.2",
         "html2canvas": "^1.0.0-alpha.10",
         "jquery": "^3.3.1",

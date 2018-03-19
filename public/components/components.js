@@ -1,19 +1,19 @@
-var app = angular.module('myApp', ['ngRoute','ui.router']);
+var app = angular.module('myApp', ['ngRoute', 'ui.router']);
 
 app.config(function ($stateProvider, $locationProvider, $urlRouterProvider) {
   //$locationProvider.html5Mode(true);
   $locationProvider.hashPrefix('');
 
   $stateProvider.state('home', {
-    url:'/home',
+    url: '/home',
     controller: 'myCtrl',
     templateUrl: '../home.html'
   }).state('create', {
-    url:'/create',
+    url: '/create',
     controller: 'myCtrl',
     templateUrl: '../create.html'
   }).state('chess', {
-    url:'/chess',
+    url: '/chess',
     controller: 'myCtrl',
     templateUrl: '../chess.html'
   });
@@ -36,14 +36,14 @@ app.factory("data", function () {
 });
 
 
-app.controller('myCtrl', function ($rootScope, $scope, $interval, $http, $location, data) {
+app.controller('myCtrl', function ($rootScope, $scope, $interval, $http, $location, $window, data) {
 
   $scope.game = {};
   $scope.game.chat = new Array();
   $scope.gameData = data.get();
 
-  initiateFunctions($scope.game, $location, data);
-  initiateDBFunctions($scope, $http);
+  initiateFunctions($scope.game, $location, $window, data);
+  initiateDBFunctions($scope, $http, $window);
   $scope.game.table = init();
   $scope.game.turn = getFirstTurn(); //Selects a color to iniciate the game  $scope.game.blackScore = 0;
 
@@ -85,16 +85,21 @@ function init() {
   return table;
 }
 
-function initiateFunctions(scope, location, data) {
+function initiateFunctions(scope, location,window, data) {
 
-  scope.insertMessage = function(event){
-     if(event.keyCode == 13) {
-       scope.chat.push(scope.newMessage);
-       scope.newMessage = null;
-     }
+  scope.insertMessage = function (event) {
+    if (event.keyCode == 13) {
+      scope.chat.push(scope.newMessage);
+      scope.newMessage = null;
+      var chatBox = document.getElementById("chatBox");
+      chatBox.scrollTop = chatBox.scrollHeight;
+    }
   };
   scope.saveGame = function () {
-    data.set({title: scope.title, time: scope.time});
+    data.set({
+      title: scope.title,
+      time: scope.time
+    });
     location.path('/chess');
   };
 
@@ -163,26 +168,29 @@ function initiateFunctions(scope, location, data) {
   };
 }
 
-function initiateDBFunctions(scope, http) {
+function initiateDBFunctions(scope, http, window) {
 
   /**
    * Saving game
    */
   scope.save = function () {
-    scope.game.moment = new Date();
-    http({
-      method: 'POST',
-      url: 'http://localhost:3000/save',
-      data: scope.game,
-      headers: {
-        'Content-Type': 'application/x-www-form-urlencoded'
-      },
-      dataType: 'json'
-    }).success(function (response) {
-      window.alert(JSON.stringify(response, null, 4));
-    }).error(function (response) {
-      window.alert("Error: " + JSON.stringify(response, null, 4));
-    });
+    setTimeout(function () {
+      scope.game.canvasUrl = window.canvasUrl;
+      scope.game.moment = new Date();
+      http({
+        method: 'POST',
+        url: 'http://localhost:3000/save',
+        data: scope.game,
+        headers: {
+          'Content-Type': 'application/x-www-form-urlencoded'
+        },
+        dataType: 'json'
+      }).success(function (response) {
+        window.alert(JSON.stringify(response, null, 4));
+      }).error(function (response) {
+        window.alert("Error: " + JSON.stringify(response, null, 4));
+      });
+    }, 2000);
   };
 
   /**
