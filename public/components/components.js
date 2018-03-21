@@ -42,6 +42,69 @@ app.controller('myCtrl', function ($rootScope, $scope, $interval, $http, $locati
   $scope.game.chat = new Array();
   $scope.gameData = data.get();
 
+  var peers = new Array();
+  var masterConnection;
+  var friendConnection;
+  $scope.game.master = true;
+
+  var peer = new Peer({
+    key: '34ef8ao9don7b9'
+  });
+
+  peer.on('open', function (id) {
+    $scope.ownPeerId = id;
+    peers.push(id);
+  });
+
+  $scope.startGame = function () {
+    if ($scope.game.master) {
+      friendConnection.send(getNextTurn($scope.game.turn));
+    }
+  };
+
+  $scope.sendData = function () {
+    if (!$scope.game.master) {
+      masterConnection.send('This is master window');
+    } else {
+      friendConnection.send('This is friend window');
+    }
+  };
+
+  peer.on('connection', function (conn) {
+    $window.alert('connected');
+    $window.alert(conn.peer);
+    if (!contains(peers, conn.peer)) {
+      friendConnection = peer.connect('' + conn.peer);
+    }
+    peers.push(conn.peer);
+    conn.on('data', function (data) {
+      // Will print 'hi!'
+      $window.alert(data);
+      if(data.table!=undefined){
+        $scope.game = data;
+      }else{
+        $scope.game[data.dx][data.dy].piece = $scope.game[data.ox][data.oy].piece;
+        $scope.game[data.ox][data.oy] = undefined;
+      }
+    });
+
+    conn.on('close', function (data) {
+      // Will print 'hi!'
+      $window.alert(conn.peer + " left");
+      peers.slice(peers.indexOf(conn.peer), 1);
+    });
+  });
+
+  peer.on('error', function (err) {
+    $window.alert(err);
+  });
+
+  $scope.connectPeer = function (id) {
+    masterConnection = peer.connect('' + id);
+    peers.push(id);
+    $scope.game.master = false;
+  };
+
   initiateFunctions($scope.game, $location, $window, data);
   initiateDBFunctions($scope, $http, $window);
   $scope.game.table = init();
@@ -85,7 +148,7 @@ function init() {
   return table;
 }
 
-function initiateFunctions(scope, location,window, data) {
+function initiateFunctions(scope, location, window, data) {
 
   scope.insertMessage = function (event) {
     if (event.keyCode == 13) {
@@ -98,7 +161,7 @@ function initiateFunctions(scope, location,window, data) {
   scope.saveGame = function () {
     data.set({
       title: scope.title,
-      time: scope.time
+      time: scope.time,
     });
     location.path('/chess');
   };
@@ -771,4 +834,14 @@ function getWinner(scope) {
       scope.turn = "white";
     }
   }
+}
+
+function generateId() {
+  var id = '';
+
+  for (var i = 0; i < 6; i++) {
+    id += Math.round(Math.random() * 9);
+  }
+
+  return id;
 }
