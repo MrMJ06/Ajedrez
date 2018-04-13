@@ -28,9 +28,3 @@ app.use("/scripts",express.static(__dirname+"/node_modules/bootstrap/dist"));
 app.use("/scripts",express.static(__dirname+"/node_modules/jquery/dist"));
 app.use("/scripts",express.static(__dirname+"/node_modules/html2canvas/dist"));
 app.use("/api",expressPeerServer(server, options));
-
-server.on('connection',function(id){
-    console.log('User connected ');
-});
-
-
