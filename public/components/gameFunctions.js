@@ -34,6 +34,11 @@ function initiateFunctions(scope, location, window, data) {
         location.path('/chess');
     };
 
+    scope.restoreGame = function (g) {
+        data.game = g;
+        location.path('/chess');
+    };
+
     scope.selectBox = function (box) {
         let selectedPiece;
         let selectedBoxes = new Array();

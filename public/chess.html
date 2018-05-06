@@ -29,8 +29,8 @@
     </h2>
 </div>
 <div class="row justify-content-start">
-    <div class="col col-3">
-        <div id="chatBox" class="chatBox">
+    <div id="chatBox" class="col col-3">
+        <div class="chatBox">
             <p ng-repeat="message in game.chat">
                 {{message}}
             </p>
@@ -78,7 +78,7 @@
         <button class="btn btn-outline-info" ng-click="connectPeer(peerId);">Connect</button>
         <button class="btn btn-outline-info" ng-click="sendData();">Send</button>
         <button class="btn btn-outline-info" ng-if="game.master" ng-click="startGame();">Start Game</button>
-        {{ownPeerId}}
+        My id: {{ownPeerId}}
         {{game.master}}, {{connected}}
     </div>
 </div>

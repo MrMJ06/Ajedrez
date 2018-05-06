@@ -1,14 +1,3 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.6.4/angular.min.js"></script>
-    <script src="components/components.js"></script>
-    <script src="../node_modules/angular-route/angular-route.js"></script>
-    <meta http-equiv="X-UA-Compatible" content="ie=edge">
-    <title>Saved games</title>
-</head>
 <body>
     <div ng-app="myApp">
         <div ng-init="getGames()">
@@ -21,9 +10,9 @@
                 <tr ng-repeat="x in gameList">
                     <td>{{ x.whiteScore }}</td>
                     <td>{{ x.blackScore }}</td>
+                    <td><button ng-click="game.restoreGame(x)">Restore game</button></td>
                 </tr>
             </table> 
         </div>
     </div>
 </body>
-</html>

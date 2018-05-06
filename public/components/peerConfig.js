@@ -3,16 +3,15 @@ function peerConfiguration(scope, window) {
     var friendConnection; //Connection to the frien master->friend
     scope.game.master = true; //Represents that you are the own of your game
     var peers = new Array();
-  
-    var peer = new Peer({
-      key: '34ef8ao9don7b9'
-    });
-  
+
+    var peer = new Peer();
+    
     //Instantiate your peer
     peer.on('open', function (id) {
       scope.apply(function () {
         scope.ownPeerId = id;
         peers.push(id);
+        window.alert("here");
       });
     });
   

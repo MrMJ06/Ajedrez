@@ -6,6 +6,7 @@ class Timer{
     }
 
      subSecond(scope){
+        window.alert("here");
         if(this.seconds==0 && this.minutes==0){
             scope.end=true;
             getWinner(scope);
@@ -24,12 +25,12 @@ function getWinner(scope){
     if(scope.whiteScore>scope.blackScore){
         scope.turn = "white";
     }else if(scope.whiteScore<scope.blackScore){
-        scope.turn="black"
+        scope.turn="black";
     }else{
         if(scope.turn=="white"){
             scope.turn="black";
         }else{
-            scope.turn="white"
+            scope.turn="white";
         }
     }
 }

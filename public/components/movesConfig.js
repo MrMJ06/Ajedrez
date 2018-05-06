@@ -55,7 +55,6 @@ function getQBTMoves(box, scope) {
 
     for (var i = 1; i < 8; i++) {
         if (box.piece != undefined && box.piece.type != "bishop") { //Queen and Tower selectedPieces
-            window.alert(box.piece.type);
             if (!rBlocked && (box.x + i) < 8 && scope.table[box.y][box.x + i] != undefined && scope.table[box.y][box.x + i].piece == undefined) { //Selects the right
                 selectedBoxes.push(scope.table[box.y][box.x + i]);
             } else if (!rBlocked && (box.x + i) < 8 && scope.table[box.y][box.x + i] != undefined && scope.table[box.y][box.x + i].piece != undefined) {
