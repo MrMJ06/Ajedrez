@@ -5,16 +5,15 @@
 function getPeonMoves(box, scope) {
 
     let selectedBoxes = new Array();
-
-    if ((box.x + 1) < 8 && scope.table[box.y][box.x + 1].piece === undefined && box.piece.color == 'black') { //Black move
+    if ((box.x + 1) < 8 && scope.table[box.y][box.x + 1].piece === undefined && box.piece.color == 'black' && !scope.started) { //Black move
         selectedBoxes.push(scope.table[box.y][box.x + 1]);
-        if ((box.x + 2) < 8 && scope.table[box.y][box.x + 2].piece === undefined && box.piece.firstMove == true) { //The firs time a peon can move 2 boxes
+        if (((box.x + 2) < 8 && scope.table[box.y][box.x + 2].piece === undefined && box.piece.firstMove == true) && !scope.started && box.piece.firstMove == true) { //The firs time a peon can move 2 boxes
             selectedBoxes.push(scope.table[box.y][box.x + 2]);
         }
 
-    } else if ((box.x - 1) >= 0 && scope.table[box.y][box.x - 1].piece === undefined && box.piece.color == 'white') { //White move
+    } else if (((box.x - 1) >= 0 && scope.table[box.y][box.x - 1].piece === undefined && box.piece.color == 'white') || scope.started) { //White move
         selectedBoxes.push(scope.table[box.y][box.x - 1]);
-        if ((box.x - 2) >= 0 && scope.table[box.y][box.x - 2].piece === undefined && box.piece.firstMove == true) { //The firs time a peon can move 2 boxes
+        if (((box.x - 2) >= 0 && scope.table[box.y][box.x - 2].piece === undefined && box.piece.firstMove == true) || scope.started && box.piece.firstMove == true) { //The firs time a peon can move 2 boxes
             selectedBoxes.push(scope.table[box.y][box.x - 2]);
         }
     }
@@ -25,10 +24,10 @@ function getPeonMoves(box, scope) {
         selectedBoxes.push(scope.table[box.y + 1][box.x - 1]);
         scope.table[box.y + 1][box.x - 1].piece.threatened = true;
     }
-    if ((box.x + 1) < 8 && (box.y - 1) >= 0 && scope.table[box.y - 1][box.x + 1].piece !== undefined && box.piece.color == 'black' && scope.table[box.y - 1][box.x + 1].piece.color == "white") {
+    if (((box.x + 1) < 8 && (box.y - 1) >= 0 && scope.table[box.y - 1][box.x + 1].piece !== undefined && box.piece.color == 'black' && scope.table[box.y - 1][box.x + 1].piece.color == "white")) {
         selectedBoxes.push(scope.table[box.y - 1][box.x + 1]);
         scope.table[box.y - 1][box.x + 1].piece.threatened = true;
-    } else if ((box.x - 1) >= 0 && (box.y - 1) >= 0 && scope.table[box.y - 1][box.x - 1].piece !== undefined && box.piece.color == 'white' && scope.table[box.y - 1][box.x - 1].piece.color == "black") {
+    } else if (((box.x - 1) >= 0 && (box.y - 1) >= 0 && scope.table[box.y - 1][box.x - 1].piece !== undefined && box.piece.color == 'white' && scope.table[box.y - 1][box.x - 1].piece.color == "black")) {
         selectedBoxes.push(scope.table[box.y - 1][box.x - 1]);
         scope.table[box.y - 1][box.x - 1].piece.threatened = true;
     }
@@ -55,6 +54,7 @@ function getQBTMoves(box, scope) {
 
     for (var i = 1; i < 8; i++) {
         if (box.piece != undefined && box.piece.type != "bishop") { //Queen and Tower selectedPieces
+            window.alert(box.piece.type);
             if (!rBlocked && (box.x + i) < 8 && scope.table[box.y][box.x + i] != undefined && scope.table[box.y][box.x + i].piece == undefined) { //Selects the right
                 selectedBoxes.push(scope.table[box.y][box.x + i]);
             } else if (!rBlocked && (box.x + i) < 8 && scope.table[box.y][box.x + i] != undefined && scope.table[box.y][box.x + i].piece != undefined) {
@@ -64,9 +64,9 @@ function getQBTMoves(box, scope) {
                     scope.table[box.y][box.x + i].piece.threatened = true;
                 }
             }
-            if (!lBlocked && (box.x - i) >= 0 && scope.table[box.y][box.x - i] != undefined && scope.table[box.y][box.x - i].piece == undefined) { //Selects the left
+            if ((!lBlocked && (box.x - i) >= 0 && scope.table[box.y][box.x - i] != undefined && scope.table[box.y][box.x - i].piece == undefined)) { //Selects the left
                 selectedBoxes.push(scope.table[box.y][box.x - i]);
-            } else if (!lBlocked && (box.x - i) >= 0 && scope.table[box.y][box.x - i] != undefined && scope.table[box.y][box.x - i].piece != undefined) {
+            } else if ((!lBlocked && (box.x - i) >= 0 && scope.table[box.y][box.x - i] != undefined && scope.table[box.y][box.x - i].piece != undefined )) {
                 lBlocked = true;
                 if (scope.table[box.y][box.x - i].piece != undefined && scope.table[box.y][box.x - i].piece.color != box.piece.color) {
                     selectedBoxes.push(scope.table[box.y][box.x - i]);
@@ -82,7 +82,7 @@ function getQBTMoves(box, scope) {
                     scope.table[box.y + i][box.x].piece.threatened = true;
                 }
             }
-            if (!bBlocked && (box.y - i) >= 0 && scope.table[box.y - i][box.x] != undefined && scope.table[box.y - i][box.x].piece === undefined) { //Selects the buttom
+            if (!bBlocked && (box.y - i) >= 0 && scope.table[box.y - i][box.x] != undefined && scope.table[box.y - i][box.x].piece === undefined ) { //Selects the buttom
                 selectedBoxes.push(scope.table[box.y - i][box.x]);
             } else if (!bBlocked && (box.y - i) >= 0 && scope.table[box.y - i][box.x] != undefined && scope.table[box.y - i][box.x].piece != undefined) {
                 bBlocked = true;
@@ -93,7 +93,7 @@ function getQBTMoves(box, scope) {
             }
         }
         if (box.piece != undefined && box.piece.type != "tower") { //Queen and Bishop selected pieces
-            if (!rtBlocked && (box.y + i) < 8 && (box.x + i) < 8 && scope.table[box.y + i][box.x + i] != undefined && scope.table[box.y + i][box.x + i].piece === undefined) { //Right top diagonal
+            if (!rtBlocked && (box.y + i) < 8 && (box.x + i) < 8 && scope.table[box.y + i][box.x + i] != undefined && scope.table[box.y + i][box.x + i].piece === undefined ) { //Right top diagonal
                 selectedBoxes.push(scope.table[box.y + i][box.x + i]);
             } else if (!rtBlocked && (box.y + i) < 8 && (box.x + i) < 8 && scope.table[box.y + i][box.x + i] != undefined && scope.table[box.y + i][box.x + i].piece != undefined) {
                 rtBlocked = true;

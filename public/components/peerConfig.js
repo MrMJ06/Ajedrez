@@ -1,17 +1,18 @@
+
 function peerConfiguration(scope, window) {
+    
     var masterConnection; //Connection to the master friend->master
     var friendConnection; //Connection to the frien master->friend
     scope.game.master = true; //Represents that you are the own of your game
+    
     var peers = new Array();
-
-    var peer = new Peer();
+    var peer = new Peer(peerIdGenerator(), {host: 'localhost', port: 8080, path: '/peer'});
     
     //Instantiate your peer
     peer.on('open', function (id) {
-      scope.apply(function () {
+      scope.$apply( function(){
         scope.ownPeerId = id;
         peers.push(id);
-        window.alert("here");
       });
     });
   
@@ -32,13 +33,15 @@ function peerConfiguration(scope, window) {
   
       scope.game.color = color; //Set your color in the game
       scope.game.turn = "white";
-  
+
+      scope.game.table = init(scope);
       var startInfo = {};
       if (scope.game.master) {
         startInfo.type = 'startInfo';
         startInfo.started = true;
         startInfo.color = getNextTurn(color); //Set the complementary color to your friend
         friendConnection.send(startInfo);
+        scope.game.started = true;
       }
     };
   
@@ -50,11 +53,10 @@ function peerConfiguration(scope, window) {
       data.type = "move";
       //origin
       data.oy = selectedPiece.y;
-      data.ox = selectedPiece.x;
+      data.ox = 7 - selectedPiece.x;
       //destiny
       data.dy = box.y;
-      data.dx = box.x;
-  
+      data.dx = 7 - box.x;
       if (scope.game.master) {
         friendConnection.send(data);
       } else {
@@ -81,8 +83,6 @@ function peerConfiguration(scope, window) {
   
       //Receives data from the opponent
       conn.on('data', function (data) {
-        window.alert(JSON.stringify(data));
-  
         if (data.type == "table") {
           scope.game = data;
         } else if (data.type == "move") { //The opponent want to move a piece
@@ -96,13 +96,24 @@ function peerConfiguration(scope, window) {
 
 
 function contains(collection, value) {
-    var result = false;
-    for (var i = 0; i < collection.length; i++) {
-      if (collection[i] == value) {
-        result = true;
-        break;
-      }
+  var result = false;
+  for (var i = 0; i < collection.length; i++) {
+    if (collection[i] == value) {
+      result = true;
+      break;
     }
-  
-    return result;
   }
+
+  return result;
+}
+
+function peerIdGenerator(){
+  var res = "";
+  var alphabet = "1234567890abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWYZ_-";
+
+  for(var i=0; i<10;i++){
+    res+=alphabet.charAt(Math.floor(alphabet.length*Math.random()));
+  }
+
+  return res;
+}

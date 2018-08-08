@@ -3,12 +3,13 @@
  */
 
 //Instantiate the table
-function init() {
+function init(scope) {
+    alert("here");
     var table = [];
     for (var i = 0; i < 8; i++) {
         var row = [];
         for (var j = 0; j < 8; j++) {
-            row.push(putPiece(i, j)); //add the pieces
+            row.push(putPiece(i, j, scope)); //add the pieces
         }
         table.push(row);
     }
@@ -99,7 +100,6 @@ function initiateFunctions(scope, location, window, data) {
             box.selected = !box.selected;
             //If a user selects a piece then get their posible moves
             selectedBoxes = getSelectedBoxes(box, scope);
-
             selectBoxes(selectedBoxes);
         } else { //In any other case we clear the table
             clearTable(scope);
@@ -111,7 +111,7 @@ function initiateFunctions(scope, location, window, data) {
  * Putting pieces 
  */
 //TODO: implement revert move
-function putPiece(i, j) {
+function putPiece(i, j, scope) {
     var box = new Object();
     box.x = j;
     box.y = i;
@@ -119,20 +119,25 @@ function putPiece(i, j) {
     /**
      * initaiate peons
      */
+    var color = "black";
+    if(scope.game.color!=undefined){
+        color = getNextTurn(scope.game.color);
+    }
+
     if (j == 1) {
+       
         box.piece = {
             type: "peon",
-            color: "black",
+            color: color,
             x: j,
             y: i,
             firstMove: true,
             threatened: false,
-
         };
     } else if (j == 6) {
         box.piece = {
             type: "peon",
-            color: "white",
+            color: getNextTurn(color),
             x: j,
             y: i,
             firstMove: true,
@@ -143,7 +148,7 @@ function putPiece(i, j) {
     else if (j === 0 && i === 0 || j === 0 & i === 7) {
         box.piece = {
             type: "tower",
-            color: "black",
+            color: color,
             x: j,
             y: i,
             threatened: false
@@ -151,7 +156,7 @@ function putPiece(i, j) {
     } else if (j === 7 && i === 0 || j === 7 & i === 7) {
         box.piece = {
             type: "tower",
-            color: "white",
+            color: getNextTurn(color),
             x: j,
             y: i,
             threatened: false
@@ -161,7 +166,7 @@ function putPiece(i, j) {
     else if (j === 0 && i === 1 || j === 0 & i === 6) {
         box.piece = {
             type: "horse",
-            color: "black",
+            color: color,
             x: j,
             y: i,
             threatened: false
@@ -169,7 +174,7 @@ function putPiece(i, j) {
     } else if (j === 7 && i === 1 || j === 7 & i === 6) {
         box.piece = {
             type: "horse",
-            color: "white",
+            color: getNextTurn(color),
             x: j,
             y: i,
             threatened: false
@@ -179,7 +184,7 @@ function putPiece(i, j) {
     else if (j === 0 && i === 2 || j === 0 & i === 5) {
         box.piece = {
             type: "bishop",
-            color: "black",
+            color: color,
             x: j,
             y: i,
             threatened: false
@@ -187,7 +192,7 @@ function putPiece(i, j) {
     } else if (j === 7 && i === 2 || j === 7 & i === 5) {
         box.piece = {
             type: "bishop",
-            color: "white",
+            color: getNextTurn(color),
             x: j,
             y: i,
             threatened: false
@@ -197,7 +202,7 @@ function putPiece(i, j) {
     else if (j === 0 && i === 3) {
         box.piece = {
             type: "king",
-            color: "black",
+            color: color,
             x: j,
             y: i,
             threatened: false
@@ -205,7 +210,7 @@ function putPiece(i, j) {
     } else if (j === 0 && i === 4) {
         box.piece = {
             type: "queen",
-            color: "black",
+            color: color,
             x: j,
             y: i,
             threatened: false
@@ -215,7 +220,7 @@ function putPiece(i, j) {
     else if (j === 7 && i === 3) {
         box.piece = {
             type: "king",
-            color: "white",
+            color: getNextTurn(color),
             x: j,
             y: i,
             threatened: false
@@ -223,7 +228,7 @@ function putPiece(i, j) {
     } else if (j === 7 && i === 4) {
         box.piece = {
             type: "queen",
-            color: "white",
+            color: getNextTurn(color),
             x: j,
             y: i,
             threatened: false
@@ -283,7 +288,7 @@ function getNextTurn(turn) {
 
 function getSelectedBoxes(box, scope) {
     var selectedBoxes;
-
+    
     switch (box.piece.type) {
         case "peon":
             selectedBoxes = getPeonMoves(box, scope);
@@ -409,9 +414,12 @@ function getWinner(scope) {
 }
 
 function setInitialValues(scope, data) {
-    scope.game.turn = "white";
-    scope.game.started = data.started;
-    scope.game.color = data.color;
+    scope.$apply(function () {
+        scope.game.turn = "white";
+        scope.game.started = true;
+        scope.game.color = data.color;
+        scope.game.table = init(scope);
+    });
 }
 
 function movePiece(scope, data) {

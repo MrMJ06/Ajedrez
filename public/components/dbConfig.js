@@ -5,7 +5,7 @@ function initiateDBFunctions(scope, http, window) {
      */
     scope.save = function () {
         setTimeout(function () {
-           // scope.game.canvasUrl = window.canvasUrl;
+           scope.game.canvasUrl = window.canvasUrl;
             scope.game.moment = new Date();
             http({
                 method: 'POST',

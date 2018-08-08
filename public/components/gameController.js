@@ -42,10 +42,10 @@ app.factory("data", function () {
 
 app.controller('chessCtrl', function ($rootScope, $scope, $interval, $http, $location, $window, data) {
   configGame($scope, $interval, data);
+ 
   peerConfiguration($scope, $window);
   initiateFunctions($scope.game, $location, $window, data);
   initiateDBFunctions($scope, $http, $window);
-
 });
 
 
@@ -57,6 +57,7 @@ function configGame(scope, interval, data) {
 
 
   scope.gameData = data.get();
+  scope.ownPeerId = "";
   if (data.game != undefined) {
     scope.game = data.game;
   } else {
@@ -65,7 +66,7 @@ function configGame(scope, interval, data) {
     scope.game.chat = new Array();
     scope.game.started = false;
 
-    scope.game.table = init(); //Put the pieces in the game
+    scope.game.table = init(scope); //Put the pieces in the game
     scope.game.turn = getFirstTurn(); //Selects a color to iniciate the game  $scope.game.blackScore = 0;
 
     scope.game.end = false; //True if the game finish
