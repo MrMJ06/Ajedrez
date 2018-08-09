@@ -123,6 +123,12 @@ function putPiece(i, j, scope) {
     if(scope.game.color!=undefined){
         color = getNextTurn(scope.game.color);
     }
+    var typeK = "king";
+    var typeQ = "queen";
+    if(scope.game.color!=undefined && scope.game.color=='white'){
+        typeK = "queen";
+        typeQ = "king";
+    }
 
     if (j == 1) {
        
@@ -200,8 +206,9 @@ function putPiece(i, j, scope) {
     }
     //Initiate king and queen black
     else if (j === 0 && i === 3) {
+        
         box.piece = {
-            type: "king",
+            type: typeK,
             color: color,
             x: j,
             y: i,
@@ -209,7 +216,7 @@ function putPiece(i, j, scope) {
         };
     } else if (j === 0 && i === 4) {
         box.piece = {
-            type: "queen",
+            type: typeQ,
             color: color,
             x: j,
             y: i,
@@ -219,7 +226,7 @@ function putPiece(i, j, scope) {
     //Initiate king and queen white
     else if (j === 7 && i === 3) {
         box.piece = {
-            type: "king",
+            type: typeK,
             color: getNextTurn(color),
             x: j,
             y: i,
@@ -227,7 +234,7 @@ function putPiece(i, j, scope) {
         };
     } else if (j === 7 && i === 4) {
         box.piece = {
-            type: "queen",
+            type: typeQ,
             color: getNextTurn(color),
             x: j,
             y: i,

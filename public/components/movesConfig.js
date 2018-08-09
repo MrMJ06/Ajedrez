@@ -3,7 +3,7 @@
  */
 
 function getPeonMoves(box, scope) {
-
+    
     let selectedBoxes = new Array();
     if ((box.x + 1) < 8 && scope.table[box.y][box.x + 1].piece === undefined && box.piece.color == 'black' && !scope.started) { //Black move
         selectedBoxes.push(scope.table[box.y][box.x + 1]);
@@ -11,23 +11,23 @@ function getPeonMoves(box, scope) {
             selectedBoxes.push(scope.table[box.y][box.x + 2]);
         }
 
-    } else if (((box.x - 1) >= 0 && scope.table[box.y][box.x - 1].piece === undefined && box.piece.color == 'white') || scope.started) { //White move
+    } else if (((box.x - 1) >= 0 && scope.table[box.y][box.x - 1].piece === undefined) &&( box.piece.color == 'white' || scope.started)) { //White move
         selectedBoxes.push(scope.table[box.y][box.x - 1]);
-        if (((box.x - 2) >= 0 && scope.table[box.y][box.x - 2].piece === undefined && box.piece.firstMove == true) || scope.started && box.piece.firstMove == true) { //The firs time a peon can move 2 boxes
+        if ((box.x - 2) >= 0 && scope.table[box.y][box.x - 2].piece === undefined && box.piece.firstMove == true) { //The firs time a peon can move 2 boxes
             selectedBoxes.push(scope.table[box.y][box.x - 2]);
         }
     }
     if ((box.x + 1) < 8 && (box.y + 1) < 8 && scope.table[box.y + 1][box.x + 1].piece !== undefined && box.piece.color == 'black' && scope.table[box.y + 1][box.x + 1].piece.color == "white") {
         selectedBoxes.push(scope.table[box.y + 1][box.x + 1]);
         scope.table[box.y + 1][box.x + 1].piece.threatened = true;
-    } else if ((box.x - 1) >= 0 && (box.y + 1) < 8 && scope.table[box.y + 1][box.x - 1].piece !== undefined && box.piece.color == 'white' && scope.table[box.y + 1][box.x - 1].piece.color == "black") {
+    } else if (((box.x - 1) >= 0 && (box.y + 1) < 8 && scope.table[box.y + 1][box.x - 1].piece !== undefined && (box.piece.color == 'white' || scope.started) && (scope.table[box.y + 1][box.x - 1].piece.color == "black"||scope.table[box.y - 1][box.x - 1].piece.color!=scope.color))) {
         selectedBoxes.push(scope.table[box.y + 1][box.x - 1]);
         scope.table[box.y + 1][box.x - 1].piece.threatened = true;
     }
-    if (((box.x + 1) < 8 && (box.y - 1) >= 0 && scope.table[box.y - 1][box.x + 1].piece !== undefined && box.piece.color == 'black' && scope.table[box.y - 1][box.x + 1].piece.color == "white")) {
+    if (((box.x + 1) < 8 && (box.y - 1) >= 0 && scope.table[box.y - 1][box.x + 1].piece !== undefined && box.piece.color == 'black' && scope.table[box.y - 1][box.x + 1].piece.color == "white") ) {
         selectedBoxes.push(scope.table[box.y - 1][box.x + 1]);
         scope.table[box.y - 1][box.x + 1].piece.threatened = true;
-    } else if (((box.x - 1) >= 0 && (box.y - 1) >= 0 && scope.table[box.y - 1][box.x - 1].piece !== undefined && box.piece.color == 'white' && scope.table[box.y - 1][box.x - 1].piece.color == "black")) {
+    } else if (((box.x - 1) >= 0 && (box.y - 1) >= 0 && scope.table[box.y - 1][box.x - 1].piece !== undefined && (box.piece.color == 'white'||scope.started) && (scope.table[box.y - 1][box.x - 1].piece.color == "black"||scope.table[box.y - 1][box.x - 1].piece.color!=scope.color))) {
         selectedBoxes.push(scope.table[box.y - 1][box.x - 1]);
         scope.table[box.y - 1][box.x - 1].piece.threatened = true;
     }

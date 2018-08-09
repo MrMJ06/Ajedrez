@@ -52,10 +52,10 @@ function peerConfiguration(scope, window) {
   
       data.type = "move";
       //origin
-      data.oy = selectedPiece.y;
+      data.oy = 7 - selectedPiece.y;
       data.ox = 7 - selectedPiece.x;
       //destiny
-      data.dy = box.y;
+      data.dy = 7 - box.y;
       data.dx = 7 - box.x;
       if (scope.game.master) {
         friendConnection.send(data);
